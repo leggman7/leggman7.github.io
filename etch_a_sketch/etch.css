@@ -1,0 +1,33 @@
+h1 {
+  text-align: center;
+}
+
+h2 {
+  text-align: center;
+}
+
+body {
+  height: 100vh; /*remember this part its the important one */
+  display: flex;
+  flex-direction: column;
+
+  background-color: cadetblue;
+}
+
+.container {
+  flex: 1;
+  display: flex;
+  background-color: lavender;
+
+}
+
+.sidebar {
+  background-color: olive;
+  padding: 1em;
+}
+
+.game-area {
+  background-color: blanchedalmond;
+  flex: 1;
+  padding: 1em;
+}
