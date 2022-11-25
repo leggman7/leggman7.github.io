@@ -31,3 +31,14 @@ body {
   flex: 1;
   padding: 1em;
 }
+
+.divColumn {
+  display:flex;
+}
+
+.game-box-element {
+  background-color: beige;
+  border-style: solid;
+  width: 10px;
+  height: 10px;
+}
