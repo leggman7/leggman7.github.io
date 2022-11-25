@@ -71,24 +71,59 @@ function playRound(pChoice, cChoice){
 }
 
 function choice(e) { //this function should be called when a button clicked
-  const cChoice = this.id 
-
+  const pChoice = this.id 
+  let cChoice = getComputerChoice()
   //add "play round function here"
-  playRound(cChoice, getComputerChoice())
+  console.log("playing a game:");
+  result = playRound(pChoice, cChoice);
+  updateLastGame(pChoice, cChoice, result);
+
+
+  console.log(`The result was: ${result}`)
+  if (result == 'Computer Wins') {
+    global_cWins+=1;
+  } else if (result == 'Player Wins') {
+    global_pWins+=1;
+  } else if (result == 'tie') {
+    global_ties+=1;
+  } else {
+    alert("something screwed up");
+  }
+
+  updateBoard(global_pWins, global_cWins, global_ties);
 }
 
-function updateBoard(pWins, cWins, ties) {
-  // your JavaScript file
-  const results = document.querySelector('#p-wins');
-  results.textContent = `Player Wins: ${pWins}`;
+function updateLastGame(pChoice, cChoice, result) {
+  // update player wins
+  const pWinsDiv = document.querySelector('#p-choice');
+  pWinsDiv.textContent = `Player Choice: ${pChoice}`;
 
+  // update computer wins
+  const cWinsDiv = document.querySelector('#c-choice');
+  cWinsDiv.textContent = `Computer Choice: ${cChoice}`;
 
+  // update ties
+  const tiesDiv = document.querySelector('#result');
+  tiesDiv.textContent = `Result: ${result}`;
+}
+function updateBoard(player_wins, computer_wins, ties) {
+  // update player wins
+  const pWinsDiv = document.querySelector('#p-wins');
+  pWinsDiv.textContent = `Player Wins: ${player_wins}`;
+
+  // update computer wins
+  const cWinsDiv = document.querySelector('#c-wins');
+  cWinsDiv.textContent = `Computer Wins: ${computer_wins}`;
+
+  // update ties
+  const tiesDiv = document.querySelector('#ties');
+  tiesDiv.textContent = `ties: ${ties}`;
 }
 
 //start of non function stuff
-let pWins=0;
-let cWins=0;
-let ties=0;
+let global_pWins=0;
+let global_cWins=0;
+let global_ties=0;
 
 //Add an event listener to ALL buttons
 const btns = document.querySelectorAll('.action');
