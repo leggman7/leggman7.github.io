@@ -11,6 +11,7 @@ function getComputerChoice() {
   }
 }
 
+//getPlayerChoice deprecated, using the buttons now.
 function getPlayerChoice() {
   let choice = prompt("what do you choose? (r, p, s, rock, Rock, are all acceptable)").toLowerCase();
   switch (choice){
@@ -35,7 +36,6 @@ function playRound(pChoice, cChoice){
   const cWins = 'Computer Wins'
   const pWins = 'Player Wins'
   const tie = 'tie'
-  console.log ( `inside playRound, with player:${pChoice} and computer: ${cChoice}`);
 
   switch (pChoice) {
     case 'rock':
@@ -70,24 +70,27 @@ function playRound(pChoice, cChoice){
   }
 }
 
-function game(){
-  let playerWins = 0;
-  let playerTies = 0;
-  console.log("lets play a game to 5:");
+function choice(e) { //this function should be called when a button clicked
+  const cChoice = this.id 
 
-  for (let i=0; i<5; i++){
-    let result = playRound(getComputerChoice(), getPlayerChoice());
-    if (result == 'Player Wins'){
-      playerWins++;
-    } else if (result == 'tie') {
-      playerTies++;
-    }
-  }
-  console.log(`You won: ${playerWins} times! and tied ${playerTies} times.`)
+  //add "play round function here"
+  playRound(cChoice, getComputerChoice())
 }
-//console.log(`Computer chose ${getComputerChoice()}`);
-//console.log(`Player chose ${getPlayerChoice()}`);
-//let result = playRound(getPlayerChoice(), getComputerChoice());
-//console.log(result)
 
-game();
+function updateBoard(pWins, cWins, ties) {
+  // your JavaScript file
+  const results = document.querySelector('#p-wins');
+  results.textContent = `Player Wins: ${pWins}`;
+
+
+}
+
+//start of non function stuff
+let pWins=0;
+let cWins=0;
+let ties=0;
+
+//Add an event listener to ALL buttons
+const btns = document.querySelectorAll('.action');
+btns.forEach(btn => btn.addEventListener('click', choice) );
+
