@@ -91,6 +91,12 @@ function choice(e) { //this function should be called when a button clicked
   }
 
   updateBoard(global_pWins, global_cWins, global_ties);
+  
+  if (global_pWins >= 5) {
+    alert('Player wins 5 games first!');
+  } else if (global_cWins >= 5) {
+    alert('Computer wins 5 games first!')
+  }
 }
 
 function updateLastGame(pChoice, cChoice, result) {
