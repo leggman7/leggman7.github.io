@@ -37,5 +37,37 @@ container.appendChild(dContent);
 
 
 //create the functionality for the second button in an external file:
-const btn = document.querySelector('#btn');
-btn.onclick = () => alert("Hello World");
+const btn2 = document.querySelector('#btn2');
+btn2.onclick = () => alert("Hello World");
+
+//third button (with arrow function)
+const btn3 = document.querySelector('#btn3');
+btn3.addEventListener('click', () => {
+  alert("Hello World");
+});
+
+//fourth way to do a button (with named function)
+function alertFunction() {
+  alert("YAY! YOU DID IT!");
+}
+
+// METHOD 5, including parameters in the function
+const btn4 = document.querySelector('#btn4');
+//btn4.addEventListener('click', alertFunction);
+btn4.addEventListener('click', function (e) {
+  console.log(e.target);
+  e.target.style.background = 'blue';
+});
+
+// another example
+// buttons is a node list. It looks and acts much like an array.
+const buttons = document.querySelectorAll('button');
+
+// we use the .forEach method to iterate through each button
+buttons.forEach((button) => {
+
+  // and for each one we add a 'click' listener
+  button.addEventListener('click', () => {
+    alert(button.id);
+  });
+});
