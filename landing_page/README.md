@@ -1,0 +1,1 @@
+This project creates a landing page, a tutorial designed by The Odin Project
