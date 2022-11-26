@@ -12,18 +12,22 @@
   <h1>Yet another Magnadoodle</h1>
   <h2>lets play!</h2>
   <div class="container">
-    <div class="sidebar">The sidebar (game settings)
+    <div class="sidebar"><h2>Game settings:</h2>
+      <br>
       <div class="slider-div">
+        <div>Board Size</div>
         <input id="slider-container" type="range" min="1" max="100" value="16" class="slider" id="myRange">
+        <div class="slider-div" id="slider-value">16</div>
       </div>
-      <div id="slider-value">16</div>
+      
       <button id="reset-board">reset board</button>
-      <div id="color-picker">Color Picker</div>
+      <button id="color-picker">Color Picker</button>
+      <button id="rainbow-mode">Rainbow Mode</button>
     </div>
     <div class="game-area"></div>
   </div>
 
-  <div class="header">one of ryan's games...</div>
+  <div class="footer">2022. one of Ryan's games...</div>
 
   
   <script src="etch.js"></script>

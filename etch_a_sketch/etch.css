@@ -24,6 +24,9 @@ body {
 .sidebar {
   background-color: olive;
   padding: 1em;
+
+  display: flex;
+  flex-direction: column;
 }
 
 .game-area {
@@ -50,4 +53,23 @@ body {
 
 .hover-style {
   background-color: black;
+}
+
+button {
+  background-color: olive;
+  border: none;
+  background-color: darkgoldenrod;
+  text-align: center;
+  color: blanchedalmond;
+
+  padding: 1em;
+  margin: 1em;
+}
+
+.slider-div {
+  text-align: center;
+}
+
+.footer {
+  text-align: center;
 }
