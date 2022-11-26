@@ -1,6 +1,6 @@
 function createDivBox(){
   const container = document.querySelector('.game-area');
-  resetGameArea(container);
+  resetGameArea();
   size = slider.value;
 
   for (let i=1; i<=size; i++) { //create a column
@@ -16,16 +16,21 @@ function createDivBox(){
       divColumn.appendChild(divRow);
     }
   }
+
+  // add mouseover (hover) for the div elements
+  const gameBox = document.getElementsByClassName('game-box-element')
+  for (const element of gameBox) {
+    element.addEventListener("mouseover", onHover);
+  }
 }
 
-function resetGameArea(container){
-  // let divColumn = document.getElementsByClassName("divColumn");
-  // container.removeChild(divColumn);
-  // haven't figured this out yet
+function resetGameArea() {
+  const container = document.querySelector('.game-area');
+  container.replaceChildren();
 }
 
 function onHover() {
-  this.classList.add("onHover");
+  this.classList.toggle("hover-style");
   console.log(this);
 }
 
@@ -44,8 +49,4 @@ btn.addEventListener('click', createDivBox);
 
 createDivBox(16)  //temporary, create the gameboard
 
-// add mouseover (hover) for the div elements
-const gameBox = document.getElementsByClassName('game-box-element')
-for (const element of gameBox) {
-  element.addEventListener("mouseover", onHover);
-}
+

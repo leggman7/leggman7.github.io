@@ -43,6 +43,6 @@ body {
   height: 10px;
 }
 
-.on-hover {
-  background-color: darkolivegreen;
+.hover-style {
+  background-color: black;
 }
