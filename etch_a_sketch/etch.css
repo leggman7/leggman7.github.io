@@ -28,19 +28,24 @@ body {
 
 .game-area {
   background-color: blanchedalmond;
-  flex: 1;
   padding: 1em;
+  height: 500px;
+  width: 500px;
+  outline-style: dotted;
+
+  display: flex;
+  flex-direction: column;
 }
 
 .divColumn {
+  flex: 1;
   display:flex;
 }
 
 .game-box-element {
+  flex: 1;
   background-color: beige;
   border-style: solid;
-  width: 10px;
-  height: 10px;
 }
 
 .hover-style {

@@ -3,16 +3,15 @@ function createDivBox(){
   resetGameArea();
   size = slider.value;
 
+
   for (let i=1; i<=size; i++) { //create a column
     let divColumn = document.createElement('div');
-    //divColumn.textContent = 'x';
     divColumn.classList = 'divColumn';
     container.appendChild(divColumn);
 
     for (let j=1; j<=size; j++) { //create a row
       let divRow = document.createElement('div');
       divRow.classList = 'game-box-element';
-      // divRow.textContent = 'y'; //not required anymore
       divColumn.appendChild(divRow);
     }
   }
@@ -30,7 +29,7 @@ function resetGameArea() {
 }
 
 function onHover() {
-  this.classList.toggle("hover-style");
+  this.classList.add("hover-style");
   console.log(this);
 }
 
