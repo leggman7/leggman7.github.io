@@ -24,6 +24,11 @@ function resetGameArea(container){
   // haven't figured this out yet
 }
 
+function onHover() {
+  this.classList.add("onHover");
+  console.log(this);
+}
+
 //implements a slider
 let slider = document.getElementById("slider-container");
 let output = document.getElementById("slider-value");
@@ -37,4 +42,10 @@ slider.oninput = function() {
 const btn = document.getElementById('reset-board');
 btn.addEventListener('click', createDivBox);
 
+createDivBox(16)  //temporary, create the gameboard
 
+// add mouseover (hover) for the div elements
+const gameBox = document.getElementsByClassName('game-box-element')
+for (const element of gameBox) {
+  element.addEventListener("mouseover", onHover);
+}
