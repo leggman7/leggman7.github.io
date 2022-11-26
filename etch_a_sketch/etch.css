@@ -11,14 +11,17 @@ body {
   display: flex;
   flex-direction: column;
 
+  align-items: center;
+
   background-color: cadetblue;
 }
 
 .container {
   flex: 1;
   display: flex;
-  background-color: lavender;
+  flex-direction: row;
 
+  align-items: stretch ;
 }
 
 .sidebar {
@@ -38,6 +41,7 @@ body {
 
   display: flex;
   flex-direction: column;
+  align-self: flex-start;
 }
 
 .divColumn {
@@ -57,13 +61,23 @@ body {
 
 button {
   background-color: olive;
-  border: none;
-  background-color: darkgoldenrod;
+  border-radius: 10px;
+  border-style: solid;
+  border-color: black;
   text-align: center;
   color: blanchedalmond;
 
   padding: 1em;
   margin: 1em;
+}
+
+button:hover {
+  transform: scale(1.1);
+}
+
+button.clicked {
+  background-color: cadetblue;
+  transition-duration: 0.5s;
 }
 
 .slider-div {
@@ -72,4 +86,5 @@ button {
 
 .footer {
   text-align: center;
+  color: rgb(61, 86, 86);
 }

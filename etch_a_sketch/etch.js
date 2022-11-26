@@ -1,7 +1,9 @@
 function createDivBox(){
+
   const container = document.querySelector('.game-area');
   resetGameArea();
   size = slider.value;
+
 
 
   for (let i=1; i<=size; i++) { //create a column
@@ -26,11 +28,26 @@ function createDivBox(){
 function resetGameArea() {
   const container = document.querySelector('.game-area');
   container.replaceChildren();
+
 }
 
 function onHover() {
-  this.classList.add("hover-style");
-  console.log(this);
+  if (rainbowMode){
+    //make a random color
+    rgbValue = [Math.floor(Math.random()*256), Math.floor(Math.random()*256), Math.floor(Math.random()*256)];
+    rgbString = `rgb(${rgbValue[0]}, ${rgbValue[1]}, ${rgbValue[2]})` ;
+    console.log( rgbString );
+
+    this.style.backgroundColor = rgbString;
+    console.log( this.style.backgroundColor)
+  } else {
+    this.classList.add("hover-style");
+  }
+}
+
+function toggleRainbowMode() {
+  this.classList.toggle('clicked')
+  rainbowMode = !rainbowMode;
 }
 
 //implements a slider
@@ -46,6 +63,11 @@ slider.oninput = function() {
 const btn = document.getElementById('reset-board');
 btn.addEventListener('click', createDivBox);
 
-createDivBox(16)  //temporary, create the gameboard
+// add a "rainbow mode" button
+let rainbowMode = false;
+const btnRainbow = document.getElementById('rainbow-mode');
+btnRainbow.addEventListener('click', toggleRainbowMode );
+
+createDivBox(16)  //initialize the gameboard
 
 
