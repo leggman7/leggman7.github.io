@@ -1,0 +1,37 @@
+.container {
+    border: 2px solid black;
+    display: grid;
+    grid-template-columns: 100px 100px 100px 100px;
+    grid-template-rows: 100px 100px 100px 100px 100px 100px;
+
+    width: max-content;
+
+    background-color: grey;
+  }
+
+#resultDisplay {
+    grid-column: 1 / -1;
+    grid-row: 1 / 2;
+    font-size: 4em;
+    text-align: right;
+}
+.row {
+    border: 1px solid blue;
+
+
+    background-color: beige;
+}
+
+button {
+    border: none;
+    margin: 1px;
+    font-size: 2em;
+}
+
+#zero {
+    grid-column: span 2;
+}
+
+.bNum {
+    background-color: bisque;
+}
