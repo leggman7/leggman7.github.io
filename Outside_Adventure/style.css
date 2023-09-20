@@ -1,0 +1,15 @@
+.media-card {
+  height: 400px;
+  background-color: steelblue;
+
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 10px;
+  margin: 10px;
+}
+
+.no-style {
+  text-decoration: none;
+  color: black;
+}
