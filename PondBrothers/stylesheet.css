@@ -1,0 +1,14 @@
+.header {
+    width: auto;
+    background-color: bisque;
+}
+
+.main {
+    width: auto;
+    background-color: rgb(134, 101, 60);
+}
+
+.footer {
+    width: auto;
+    background-color: rgb(131, 75, 7);
+}
