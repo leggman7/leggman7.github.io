@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Board with Firebase</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles -->
+    <style>
+        .container {
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center">Welcome to the Firebase-Powered Message Board</h2>
+        <div class="mb-3">
+            <label for="userName" class="form-label">Your Name</label>
+            <input type="text" class="form-control" id="userName" placeholder="Enter your name">
+        </div>
+        <div class="mb-3">
+            <label for="userMessage" class="form-label">Your Message</label>
+            <textarea class="form-control" id="userMessage" rows="3" placeholder="Enter your message"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="postMessage()">Submit</button>
+        <div id="messageBoard" class="mt-4">
+            <h4>Messages:</h4>
+            <!-- Messages will appear here -->
+        </div>
+    </div>
+
+    <!-- Firebase App is always required and must be first -->
+    <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // TODO: Replace the following with your app's Firebase project configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDtQCWjNIQEGFCVWez2CCt7bBjNONMKguw",
+            authDomain: "message-app-20cb9.firebaseapp.com",
+            projectId: "message-app-20cb9",
+            storageBucket: "message-app-20cb9.appspot.com",
+            messagingSenderId: "346935780917",
+            appId: "1:346935780917:web:88058169244ac590ed337c",
+            measurementId: "G-PFLKST8FKQ"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        function postMessage() {
+            var name = document.getElementById('userName').value.trim();
+            var message = document.getElementById('userMessage').value.trim();
+            if(name && message) {
+                db.collection("messages").add({
+                    name: name,
+                    message: message,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                })
+                .then((docRef) => {
+                    console.log("Document written with ID: ", docRef.id);
+                    loadMessages(); // Reload the messages
+                })
+                .catch((error) => {
+                    console.error("Error adding document: ", error);
+                });
+            } else {
+                alert('Please enter both name and message.');
+            }
+        }
+
+        function loadMessages() {
+            db.collection("messages").orderBy("timestamp", "desc")
+                .get()
+                .then((querySnapshot) => {
+                    var messagesHtml = '';
+                    querySnapshot.forEach((doc) => {
+                        var msg = doc.data();
+                        messagesHtml += '<p><strong>' + msg.name + ':</strong> ' + msg.message + '</p>';
+                    });
+                    document.getElementById('messageBoard').innerHTML = messagesHtml;
+                });
+        }
+
+        window.onload = function() {
+            loadMessages();
+        };
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" ></script>
+</body>
+</html>
