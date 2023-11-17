@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trips Manager</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
+    <script>
+        // TODO: Replace with your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            databaseURL: "YOUR_DATABASE_URL",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        firebase.initializeApp(firebaseConfig);
+    </script>
+</head>
+<body>
+    <h1>Add a New Trip</h1>
+    <form id="addTripForm">
+        <input type="text" id="title" placeholder="Trip Title"><br>
+        <textarea id="description" placeholder="Description"></textarea><br>
+        <input type="date" id="date"><br>
+        <button type="button" onclick="addTrip()">Add Trip</button>
+    </form>
+
+    <h2>Current Trips</h2>
+    <ul id="tripsList"></ul>
+
+    <script>
+        const tripsRef = firebase.database().ref('trips');
+
+        function addTrip() {
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            const date = document.getElementById('date').value;
+
+            tripsRef.push({
+                title: title,
+                description: description,
+                date: date
+            });
+        }
+
+        tripsRef.on('value', function(snapshot) {
+            const tripsList = document.getElementById('tripsList');
+            tripsList.innerHTML = ''; // Clear existing list
+            snapshot.forEach(function(childSnapshot) {
+                const trip = childSnapshot.val();
+                const li = document.createElement('li');
+                li.appendChild(document.createTextNode(trip.title + ' - ' + trip.description + ' - ' + trip.date));
+                tripsList.appendChild(li);
+            });
+        });
+    </script>
+</body>
+</html>
