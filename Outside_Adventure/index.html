@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backcountry Skiing Adventures</title>
+    
+    <!-- Bootstrap CSS CDN -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    
+    <!-- Bootstrap JS CDN (jQuery and Popper.js are required for Bootstrap) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <style>
+        body {
+            padding: 20px;
+        }
+    </style>
+
+    <!-- firebase user accounts setup -->
+    <script src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.css" />
+
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+    <script>
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDTQclDt55t66KZXkOfxLIWp2TXLvOIPKk",
+        authDomain: "outdoor-adventures-2750f.firebaseapp.com",
+        projectId: "outdoor-adventures-2750f",
+        storageBucket: "outdoor-adventures-2750f.appspot.com",
+        messagingSenderId: "359398860553",
+        appId: "1:359398860553:web:2aa1ea223bdd736a4e15d8",
+        measurementId: "G-8DTZBX35L9"
+      };
+
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+    </script>
+</head>
+<body>
+
+<!-- Header -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Backcountry Skiing Adventures</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+              <button onclick="signIn()">Sign in</button>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<!-- List of Trips -->
+<div class="container mt-4">
+    <h2>Upcoming Trips</h2>
+    <ul class="list-group">
+        <li class="list-group-item">Trip 1 - Location: Mountain Peak - Date: Jan 15, 2023</li>
+        <li class="list-group-item">Trip 2 - Location: Forest Trails - Date: Feb 10, 2023</li>
+        <li class="list-group-item">Trip 3 - Location: Snowy Valley - Date: Mar 5, 2023</li>
+    </ul>
+</div>
+
+<!-- Add Trip Button -->
+<div class="container mt-4">
+    <a href="./new_trip_form.html" class="btn btn-primary btn-lg btn-block">Add Trip</a>
+</div>
+
+
+<script>
+  // Firebase Authentication
+  const auth = firebase.auth();
+
+  function signIn() {
+    var provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider);
+  }
+
+  function signOut() {
+    auth.signOut();
+  }
+
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      // User is signed in
+      console.log('User signed in:', user);
+    } else {
+      // User is signed out
+      console.log('User signed out');
+    }
+  });
+</script>
+
+</body>
+</html>
