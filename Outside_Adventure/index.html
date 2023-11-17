@@ -13,22 +13,12 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore-compat.js"></script>
 
-    <!-- Firebase SDK -->
-
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
-
-    <!-- firebase user accounts setup -->
-    <script src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"></script>
-    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.css" />
-
-    <!-- firebase database adding -->
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
-
     <script>
-      // Firebase configuration
+      //Firebase configuration
       const firebaseConfig = {
         apiKey: "AIzaSyDTQclDt55t66KZXkOfxLIWp2TXLvOIPKk",
         authDomain: "outdoor-adventures-2750f.firebaseapp.com",
@@ -37,35 +27,19 @@
         messagingSenderId: "359398860553",
         appId: "1:359398860553:web:2aa1ea223bdd736a4e15d8",
         measurementId: "G-8DTZBX35L9"
-      };
+        };
 
-      // Initialize Firebase
       firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
     </script>
 
-    <!-- add trip functionality -->
-    <script>
-      function addTrip() {
-          const title = document.getElementById('title').value;
-          const description = document.getElementById('description').value;
-          const date = document.getElementById('date').value;
+    <!-- firebase user accounts setup -->
+    <script src="https://www.gstatic.com/firebasejs/ui/6.1.0/firebase-ui-auth.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.1.0/firebase-ui-auth.css" />
 
-          // Add trip to Firebase
-          const tripRef = firebase.database().ref('trips').push();
-          tripRef.set({
-              name: title,
-              description: description,
-              date: date,
-              usersGoing: {} // initially empty
-          }).then(() => {
-              alert('Trip added successfully!');
-              // Optionally reset form here
-          }).catch(error => {
-              console.error('Error adding trip:', error);
-          });
-      }
-    </script>
 </head>
+
+
 <body>
 
 <!-- Header -->
@@ -83,59 +57,90 @@
     </div>
 </nav>
 
-<!-- List of Trips -->
-<div class="container mt-4">
-    <h2>Upcoming Trips</h2>
-    <ul class="list-group">
-        <li class="list-group-item">Trip 1 - Location: Mountain Peak - Date: Jan 15, 2023</li>
-        <li class="list-group-item">Trip 2 - Location: Forest Trails - Date: Feb 10, 2023</li>
-        <li class="list-group-item">Trip 3 - Location: Snowy Valley - Date: Mar 5, 2023</li>
-    </ul>
-</div>
-
-
-
 <h1>Add a New Trip</h1>
-    <form id="addTripForm">
-        <label for="title">Title:</label><br>
-        <input type="text" id="title" name="title"><br>
-        <label for="description">Description:</label><br>
-        <input type="text" id="description" name="description"><br>
-        <label for="date">Date:</label><br>
-        <input type="date" id="date" name="date"><br>
-        <input type="button" value="Add Trip" onclick="addTrip()">
-    </form>
+<form id="addTripForm">
+    <input type="text" id="tripTitle" placeholder="Trip Title"><br>
+    <textarea id="tripDescription" placeholder="Description"></textarea><br>
+    <input type="date" id="tripDate"><br>
+    <button type="button" onclick="postTrip()">Add Trip</button>
+</form>
 
+<h2>Current Trips</h2>
+<ul id="tripsList"></ul>
 
-
-<!-- Add Trip Button
-<div class="container mt-4">
-    <a href="./new_trip_form.html" class="btn btn-primary btn-lg btn-block">Add Trip</a>
-</div> -->
-
-
+<!-- script for posting and loading trips -->
 <script>
-  // Firebase Authentication
-  const auth = firebase.auth();
 
-  function signIn() {
-    var provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider);
-  }
 
-  function signOut() {
-    auth.signOut();
-  }
+    // Function to add a trip to Firebase
 
-  auth.onAuthStateChanged(user => {
-    if (user) {
-      // User is signed in
-      console.log('User signed in:', user);
-    } else {
-      // User is signed out
-      console.log('User signed out');
+    function postTrip() {
+        var title = document.getElementById('tripTitle').value.trim();
+        var description = document.getElementById('tripDescription').value.trim();
+        var date = document.getElementById('tripDate').value.trim();
+
+        if(title && description && date) {
+            db.collection("trips").add({
+                title: title,
+                description: description,
+                date: date,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then((docRef) => {
+                console.log("Trip document written with ID: ", docRef.id);
+                loadTrips(); // Reload the trips
+            })
+            .catch((error) => {
+                console.error("Error adding trip: ", error);
+            });
+        } else {
+            alert('Please enter the title, description, and date for the trip.');
+        }
     }
-  });
+
+    function loadTrips() {
+        db.collection("trips").orderBy("timestamp", "desc")
+            .get()
+            .then((querySnapshot) => {
+                var tripsHtml = '';
+                querySnapshot.forEach((doc) => {
+                    var trip = doc.data();
+                    tripsHtml += '<p><strong>' + trip.title + ':</strong> ' + trip.description + ' - ' + trip.date + '</p>';
+                });
+                document.getElementById('tripsList').innerHTML = tripsHtml;
+            });
+    }
+
+    window.onload = function() {
+        loadTrips();
+    };
+
+
+
+</script>
+
+<!-- script for logging in -->
+<script>
+  // Initialize Firebase (make sure this is done earlier in your HTML file)
+  // firebase.initializeApp(firebaseConfig);
+
+  // Sign In Function
+  function signIn() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      firebase.auth()
+          .signInWithPopup(provider)
+          .then((result) => {
+              // This gives you a Google Access Token. You can use it to access the Google API.
+              const token = result.credential.accessToken;
+              // The signed-in user info.
+              const user = result.user;
+              console.log('User signed in:', user);
+              // You can redirect the user to another page or update the UI accordingly
+          })
+          .catch((error) => {
+              console.error('Error during sign in:', error);
+          });
+  }
 </script>
 
 </body>

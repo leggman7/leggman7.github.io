@@ -3,60 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <title>Trips Manager</title>
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
-    <script>
-        // TODO: Replace with your Firebase configuration
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            databaseURL: "YOUR_DATABASE_URL",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
-        firebase.initializeApp(firebaseConfig);
-    </script>
+
 </head>
 <body>
     <h1>Add a New Trip</h1>
     <form id="addTripForm">
-        <input type="text" id="title" placeholder="Trip Title"><br>
-        <textarea id="description" placeholder="Description"></textarea><br>
-        <input type="date" id="date"><br>
-        <button type="button" onclick="addTrip()">Add Trip</button>
+        <input type="text" id="tripTitle" placeholder="Trip Title"><br>
+        <textarea id="tripDescription" placeholder="Description"></textarea><br>
+        <input type="date" id="tripDate"><br>
+        <button type="button" onclick="postTrip()">Add Trip</button>
     </form>
 
     <h2>Current Trips</h2>
     <ul id="tripsList"></ul>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore-compat.js"></script>
+    
     <script>
-        const tripsRef = firebase.database().ref('trips');
+        // TODO: Replace with your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDTQclDt55t66KZXkOfxLIWp2TXLvOIPKk",
+        authDomain: "outdoor-adventures-2750f.firebaseapp.com",
+        projectId: "outdoor-adventures-2750f",
+        storageBucket: "outdoor-adventures-2750f.appspot.com",
+        messagingSenderId: "359398860553",
+        appId: "1:359398860553:web:2aa1ea223bdd736a4e15d8",
+        measurementId: "G-8DTZBX35L9"
+        };
 
-        function addTrip() {
-            const title = document.getElementById('title').value;
-            const description = document.getElementById('description').value;
-            const date = document.getElementById('date').value;
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
-            tripsRef.push({
-                title: title,
-                description: description,
-                date: date
-            });
+        // Function to add a trip to Firebase
+
+        function postTrip() {
+            var title = document.getElementById('tripTitle').value.trim();
+            var description = document.getElementById('tripDescription').value.trim();
+            var date = document.getElementById('tripDate').value.trim();
+
+            if(title && description && date) {
+                db.collection("trips").add({
+                    title: title,
+                    description: description,
+                    date: date,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                })
+                .then((docRef) => {
+                    console.log("Trip document written with ID: ", docRef.id);
+                    loadTrips(); // Reload the trips
+                })
+                .catch((error) => {
+                    console.error("Error adding trip: ", error);
+                });
+            } else {
+                alert('Please enter the title, description, and date for the trip.');
+            }
         }
 
-        tripsRef.on('value', function(snapshot) {
-            const tripsList = document.getElementById('tripsList');
-            tripsList.innerHTML = ''; // Clear existing list
-            snapshot.forEach(function(childSnapshot) {
-                const trip = childSnapshot.val();
-                const li = document.createElement('li');
-                li.appendChild(document.createTextNode(trip.title + ' - ' + trip.description + ' - ' + trip.date));
-                tripsList.appendChild(li);
-            });
-        });
+        function loadTrips() {
+            db.collection("trips").orderBy("timestamp", "desc")
+                .get()
+                .then((querySnapshot) => {
+                    var tripsHtml = '';
+                    querySnapshot.forEach((doc) => {
+                        var trip = doc.data();
+                        tripsHtml += '<p><strong>' + trip.title + ':</strong> ' + trip.description + ' - ' + trip.date + '</p>';
+                    });
+                    document.getElementById('tripsList').innerHTML = tripsHtml;
+                });
+        }
+
+        window.onload = function() {
+            loadTrips();
+        };
+
+
+
     </script>
 </body>
 </html>
