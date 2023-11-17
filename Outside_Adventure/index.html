@@ -57,15 +57,15 @@
             uiShown: function() {
               // The widget is rendered.
               // Hide the loader.
-              document.getElementById('loader').style.display = 'none';
+              // document.getElementById('loader').style.display = 'none';
             }
           },
           // Will use popup for IDP Providers sign-in flow instead of the default, redirect.
           signInFlow: 'popup',
-          signInSuccessUrl: '<url-to-redirect-to-on-success>',
+          // signInSuccessUrl: '<url-to-redirect-to-on-success>',
           signInOptions: [
             // List of OAuth providers supported.
-            // firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+            firebase.auth.GoogleAuthProvider.PROVIDER_ID,
             // firebase.auth.FacebookAuthProvider.PROVIDER_ID,
             firebase.auth.EmailAuthProvider.PROVIDER_ID
             // Add other providers as needed.
@@ -145,7 +145,7 @@
 
 <!-- Header -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="leggett.cc/Outside_Adventure/index.html">Backcountry Skiing Adventures</a>
+    <a class="navbar-brand" href="leggett.cc/Outside_Adventure/index.html">Golden Backcountry Skiing Adventures</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
