@@ -158,17 +158,18 @@
     </div>
 </nav>
 
-<!-- add a trip form -->
+<!-- OLD add a trip form
 <h1>Add a New Trip</h1>
 <form id="addTripForm">
     <input type="text" id="tripTitle" placeholder="Trip Title"><br>
     <textarea id="tripDescription" placeholder="Description"></textarea><br>
     <input type="date" id="tripDate"><br>
     <button type="button" onclick="postTrip()">Add Trip</button>
-</form>
+</form> -->
+
+<h2>Trips</h2>
 
 <!-- list of current trips -->
-<h2>Current Trips</h2>
 <ul id="tripsList"></ul>
 
 
@@ -179,7 +180,7 @@
 <footer style="background-color: #f1f1f1; text-align: center; padding: 10px; position: fixed; bottom: 0; width: 100%;">
   <a href="javascript:void(0)" onclick="signIn()">Sign In</a> |
   <a href="javascript:void(0)" onclick="signOut()">Sign Out</a> |
-  <a href="profile.html">Profile</a>
+  <a href="profile.html">My Profile</a>
 </footer>
 
 <!-- script for posting and loading trips -->
@@ -188,42 +189,77 @@
 
     // Function to add a trip to Firebase
 
-    function postTrip() {
-        var title = document.getElementById('tripTitle').value.trim();
-        var description = document.getElementById('tripDescription').value.trim();
-        var date = document.getElementById('tripDate').value.trim();
+    // Not required anymore as there is a seperate page for this
+    // function postTrip() {
+    //     var title = document.getElementById('tripTitle').value.trim();
+    //     var description = document.getElementById('tripDescription').value.trim();
+    //     var date = document.getElementById('tripDate').value.trim();
 
-        if(title && description && date) {
-            db.collection("trips").add({
-                title: title,
-                description: description,
-                date: date,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            })
-            .then((docRef) => {
-                console.log("Trip document written with ID: ", docRef.id);
-                loadTrips(); // Reload the trips
-            })
-            .catch((error) => {
-                console.error("Error adding trip: ", error);
-            });
-        } else {
-            alert('Please enter the title, description, and date for the trip.');
-        }
-    }
+    //     if(title && description && date) {
+    //         db.collection("trips").add({
+    //             title: title,
+    //             description: description,
+    //             date: date,
+    //             timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    //         })
+    //         .then((docRef) => {
+    //             console.log("Trip document written with ID: ", docRef.id);
+    //             loadTrips(); // Reload the trips
+    //         })
+    //         .catch((error) => {
+    //             console.error("Error adding trip: ", error);
+    //         });
+    //     } else {
+    //         alert('Please enter the title, description, and date for the trip.');
+    //     }
+    // }
 
     function loadTrips() {
-        db.collection("trips").orderBy("timestamp", "desc")
-            .get()
-            .then((querySnapshot) => {
-                var tripsHtml = '';
-                querySnapshot.forEach((doc) => {
-                    var trip = doc.data();
-                    tripsHtml += '<p><strong>' + trip.title + ':</strong> ' + trip.description + ' - ' + trip.date + '</p>';
-                });
-                document.getElementById('tripsList').innerHTML = tripsHtml;
+          db.collection("trips").orderBy("timestamp", "desc")
+        .get()
+        .then((querySnapshot) => {
+            var tripsHtml = `
+                <div class="col-md-4 mb-3">
+                  <div class="card">
+                    <a href="new_trip_form.html" class="card text-center add-trip-card">
+                        <div class="card-body">
+                            <h1 class="display-1">+</h1>
+                        </div>
+                    </a>
+                  </div>
+                </div>`;
+
+            querySnapshot.forEach((doc) => {
+                var trip = doc.data();
+                tripsHtml += `
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">${trip.title}</h5>
+                                <p class="card-text">${trip.description}</p>
+                                <p class="card-text"><small class="text-muted">${trip.date}</small></p>
+                            </div>
+                        </div>
+                    </div>`;
             });
-    }
+            document.getElementById('tripsList').innerHTML = `<div class="row">${tripsHtml}</div>`;
+        });
+    
+}
+
+
+    // function loadTrips() {
+    //     db.collection("trips").orderBy("timestamp", "desc")
+    //         .get()
+    //         .then((querySnapshot) => {
+    //             var tripsHtml = '';
+    //             querySnapshot.forEach((doc) => {
+    //                 var trip = doc.data();
+    //                 tripsHtml += '<p><strong>' + trip.title + ':</strong> ' + trip.description + ' - ' + trip.date + '</p>';
+    //             });
+    //             document.getElementById('tripsList').innerHTML = tripsHtml;
+    //         });
+    // }
 
     window.onload = function() {
         loadTrips();
