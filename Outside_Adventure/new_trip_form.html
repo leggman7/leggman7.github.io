@@ -59,63 +59,56 @@
 </nav>
 
 <!-- Add Trip Form -->
+
 <div class="card mt-3" id="tripForm">
     <div class="card-body">
         <!-- Form content here -->
         <input type="text" id="tripTitle" placeholder="Trip Title" class="form-control mb-2">
         <textarea id="tripDescription" rows="12" placeholder="Here are some suggested details to add:&#10;
-Trip Location: Mention the primary location of the trip and any key landmarks or attractions.&#10;
-Meetup Location: Provide clear details about where and when participants should gather.&#10;
-Difficulty Level: Indicate the level of difficulty (e.g., easy, moderate, hard) to set the right expectations.&#10;
-Required Skills: List any specific skills or experience needed for the trip.&#10;
-Weather and Conditions: Give an overview of expected weather conditions and terrain.&#10;
-Recommended Gear: Suggest appropriate clothing and equipment that participants should bring.&#10;
-Additional Details: Include any other information that would be helpful for participants to know, such as duration, wildlife encounters, scenic spots, etc.&#10;" class="form-control mb-2" title="The tooltip info"></textarea>
-        <input type="date" id="tripDate" class="form-control mb-2" >
+        Trip Location: Mention the primary location of the trip and any key landmarks or attractions.&#10;
+        Meetup Location: Provide clear details about where and when participants should gather.&#10;
+        Difficulty Level: Indicate the level of difficulty (e.g., easy, moderate, hard) to set the right expectations.&#10;
+        Required Skills: List any specific skills or experience needed for the trip.&#10;
+        Weather and Conditions: Give an overview of expected weather conditions and terrain.&#10;
+        Recommended Gear: Suggest appropriate clothing and equipment that participants should bring.&#10;
+        Additional Details: Include any other information that would be helpful for participants to know, such as duration, wildlife encounters, scenic spots, etc.&#10;" 
+        class="form-control mb-2" title="The tooltip info"></textarea>
+        <input type="date" id="tripDate" class="form-control mb-2">
         <input type="number" id="tripMaxParticipants" placeholder="Max Participants" class="form-control mb-2">
         <button onclick="postTrip()" class="btn btn-primary">Add Trip</button>
         <a href="index.html">I changed my mind, go back to existing Trips</a>
     </div>
-  </div>
+</div>
 
-<!-- tooltip info -->
-  <!-- Trip Location: Mention the primary location of the trip and any key landmarks or attractions.&#10;
-  Meetup Location: Provide clear details about where and when participants should gather.&#10;
-  Difficulty Level: Indicate the level of difficulty (e.g., easy, moderate, hard) to set the right expectations.&#10;
-  Required Skills: List any specific skills or experience needed for the trip.&#10;
-  Weather and Conditions: Give an overview of expected weather conditions and terrain.&#10;
-  Recommended Gear: Suggest appropriate clothing and equipment that participants should bring.&#10;
-  Additional Details: Include any other information that would be helpful for participants to know, such as duration, wildlife encounters, scenic spots, etc.&#10; -->
+<script>
+    // Function to add a trip to Firebase
+    function postTrip() {
+        var title = document.getElementById('tripTitle').value.trim();
+        var description = document.getElementById('tripDescription').value.trim();
+        var date = document.getElementById('tripDate').value.trim();
+        var tripMaxParticipants = document.getElementById('tripMaxParticipants').value.trim();
 
-  <script>
-        // Function to add a trip to Firebase
-
-        function postTrip() {
-            var title = document.getElementById('tripTitle').value.trim();
-            var description = document.getElementById('tripDescription').value.trim();
-            var date = document.getElementById('tripDate').value.trim();
-            var tripMaxParticipants = document.getElementById('tripMaxParticipants').value.trim();
-
-            if(title && description && date) {
-                db.collection("trips").add({
-                    title: title,
-                    description: description,
-                    date: date,
-                    maxParticipants: tripMaxParticipants,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                })
-                .then((docRef) => {
-                    console.log("Trip document written with ID: ", docRef.id);
-                    window.location.href = 'index.html';
-                })
-                .catch((error) => {
-                    console.error("Error adding trip: ", error);
-                });
-            } else {
-                alert('Please enter the title, description, and date for the trip.');
-            }
+        if(title && description && date) {
+            db.collection("trips").add({
+                title: title,
+                description: description,
+                date: date,
+                maxParticipants: tripMaxParticipants ? parseInt(tripMaxParticipants) : null,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                participants: [] // Initialize with empty array
+            })
+            .then((docRef) => {
+                console.log("Trip document written with ID: ", docRef.id);
+                window.location.href = 'index.html'; // Redirect after adding the trip
+            })
+            .catch((error) => {
+                console.error("Error adding trip: ", error);
+            });
+        } else {
+            alert('Please enter the title, description, and date for the trip.');
         }
+    }
+</script>
 
-    </script>
 </body>
 </html>

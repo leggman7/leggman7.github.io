@@ -168,7 +168,12 @@
         </div>
     </div>
 
-    <!-- log in div -->
+    <button id="joinTripButton" class="btn btn-primary">Join Trip</button>
+    <button id="abandonTripButton" class="btn btn-warning">Abandon Trip</button>
+
+
+
+<!-- log in div -->
 <div id="firebaseui-auth-container"></div>
 
 <!-- Footer -->
@@ -178,41 +183,139 @@
   <a href="profile.html">My Profile</a>
 </footer>
 
+<script>
 
-    <script>
+    function getTripDetails(tripId) {
+      db.collection("trips").doc(tripId).get().then((doc) => {
+        if (doc.exists) {
+            const tripData = doc.data();
+            let participantsList = '';
 
-        function getTripDetails(tripId) {
-            db.collection("trips").doc(tripId).get().then((doc) => {
-                if (doc.exists) {
-                    const tripData = doc.data();
-                    document.getElementById('tripDetails').innerHTML = `
-                        <h2>${tripData.title}</h2>
-                        <p>${tripData.description}</p>
-                        <p><strong>Date:</strong> ${tripData.date}</p>
-                        <!-- Add more fields as necessary -->
-                    `;
-                } else {
-                    document.getElementById('tripDetails').innerHTML = '<p>No trip details found.</p>';
-                }
-            }).catch((error) => {
-                console.log("Error getting document:", error);
-            });
-        }
-
-        function parseQueryParams() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const tripId = urlParams.get('id');
-            if (tripId) {
-                getTripDetails(tripId);
+            // Check if participants data exists and is an array
+            if (Array.isArray(tripData.participants)) {
+                participantsList = tripData.participants.map(participant => 
+                    `<li>${participant}</li>`).join('');
             } else {
-                document.getElementById('tripDetails').innerHTML = '<p>Trip ID not found.</p>';
+                participantsList = '<li>No participants yet</li>';
+            }
+
+            document.getElementById('tripDetails').innerHTML = `
+                <h2>${tripData.title}</h2>
+                <p>${tripData.description}</p>
+                <p><strong>Date:</strong> ${tripData.date}</p>
+                <h3>Participants:</h3>
+                <ul>${participantsList}</ul>
+                <!-- Add more fields as necessary -->
+            `;
+        } else {
+            document.getElementById('tripDetails').innerHTML = '<p>No trip details found.</p>';
+        }
+    }).catch((error) => {
+        console.log("Error getting document:", error);
+    });
+    }
+
+    function parseQueryParams() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tripId = urlParams.get('id');
+        if (tripId) {
+            getTripDetails(tripId);
+        } else {
+            document.getElementById('tripDetails').innerHTML = '<p>Trip ID not found.</p>';
+        }
+    }
+
+    window.onload = parseQueryParams;
+
+    function getTripIdFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('id'); // Assuming the URL param for the trip ID is 'id'
+    }
+
+    function joinTrip(tripId) {
+      const user = firebase.auth().currentUser;
+
+      if (user) {
+          // User is signed in, proceed to check trip details
+          const tripRef = db.collection("trips").doc(tripId);
+
+          tripRef.get().then((doc) => {
+              if (doc.exists) {
+                  const tripData = doc.data();
+                  const participantCount = tripData.participants ? tripData.participants.length : 0;
+                  const maxParticipants = tripData.maxParticipants;
+
+                  if (participantCount < maxParticipants) {
+                      // Add user to trip
+                      tripRef.update({
+                          participants: firebase.firestore.FieldValue.arrayUnion(user.displayName || user.email)
+                      }).then(() => {
+                          console.log("User added to trip");
+                          // Optionally, update the UI to reflect the change
+                      }).catch((error) => {
+                          console.error("Error joining trip: ", error);
+                      });
+                  } else {
+                      console.log("Trip is already full");
+                      // Handle the scenario when the trip is full
+                  }
+              } else {
+                  console.log("Trip not found");
+                  // Handle the scenario when the trip is not found
+              }
+          }).catch((error) => {
+              console.error("Error getting trip: ", error);
+          });
+      } else {
+          // No user is signed in
+          console.log("User not signed in");
+          // Handle the scenario when the user is not logged in
+      }
+  }
+
+    function abandonTrip(tripId) {
+            const user = firebase.auth().currentUser;
+            if (user) {
+                // User is signed in, proceed to remove them from the trip
+                const tripRef = db.collection("trips").doc(tripId);
+
+                tripRef.update({
+                    participants: firebase.firestore.FieldValue.arrayRemove(user.displayName || user.email)
+                }).then(() => {
+                    console.log("User removed from trip");
+                    // Optionally, update the UI or redirect
+                }).catch((error) => {
+                    console.error("Error abandoning trip: ", error);
+                });
+            } else {
+                // No user is signed in
+                console.log("User not signed in");
+                // Handle the scenario when the user is not logged in
             }
         }
 
-        window.onload = parseQueryParams;
-    </script>
-
+  // Attach the event listener to the 'Abandon Trip' button
+  document.getElementById('abandonTripButton').addEventListener('click', function() {
+      const tripId = getTripIdFromUrl();
+      if (tripId) {
+          abandonTrip(tripId);
+      } else {
+          console.log("Trip ID not found in URL");
+          // Handle the case where trip ID is not in the URL
+      }
+  });
+  // Attach the event listener to the 'Join Trip' button
+  document.getElementById('joinTripButton').addEventListener('click', function() {
+    const tripId = getTripIdFromUrl();
+    if (tripId) {
+        joinTrip(tripId);
+    } else {
+        console.log("Trip ID not found in URL");
+        // Handle the case where trip ID is not in the URL
+    }
+  });
 </script>
+
 
 
 
