@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Backcountry Skiing Adventures</title>
+    <title>Golden Backcountry Skiing Adventures</title>
     
     <!-- Bootstrap CSS CDN -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -143,8 +143,8 @@
 
 <body>
 
-<!-- Header -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <!-- Header -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand" href="leggett.cc/Outside_Adventure/index.html">Golden Backcountry Skiing Adventures</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -152,32 +152,27 @@
     <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
         <ul class="navbar-nav">
             <li class="nav-item">
-              <div id="signIn" onclick="signIn()">Sign in</div>
+                <div id="signIn" onclick="signIn()" class="nav-link">Sign in</div>
             </li>
         </ul>
     </div>
-</nav>
+  </nav>
 
-<!-- OLD add a trip form
-<h1>Add a New Trip</h1>
-<form id="addTripForm">
-    <input type="text" id="tripTitle" placeholder="Trip Title"><br>
-    <textarea id="tripDescription" placeholder="Description"></textarea><br>
-    <input type="date" id="tripDate"><br>
-    <button type="button" onclick="postTrip()">Add Trip</button>
-</form> -->
+  <!-- Tagline -->
+  <div class="container text-center my-4">
+    <h2>Connect with fellow adventurers to explore and <br><em>share the journey together</em></h2>
+  </div>
 
-<h2>Trips</h2>
+  <!-- List of Current Trips -->
+  <div class="container my-4">
+    <ul id="tripsList"></ul>
+  </div>
 
-<!-- list of current trips -->
-<ul id="tripsList"></ul>
-
-
-<!-- log in div -->
-<div id="firebaseui-auth-container"></div>
+  <!-- Log In Div -->
+  <div id="firebaseui-auth-container" class="container my-4"></div>
 
 <!-- Footer -->
-<footer style="background-color: #f1f1f1; text-align: center; padding: 10px; position: fixed; bottom: 0; width: 100%;">
+<footer class="bg-light text-center py-3" style="text-align: center; padding: 10px; position: fixed; bottom: 0; width: 100%;">
   <a href="javascript:void(0)" onclick="signIn()">Sign In</a> |
   <a href="javascript:void(0)" onclick="signOut()">Sign Out</a> |
   <a href="profile.html">My Profile</a>
@@ -186,83 +181,44 @@
 <!-- script for posting and loading trips -->
 <script>
 
-
-    // Function to add a trip to Firebase
-
-    // Not required anymore as there is a seperate page for this
-    // function postTrip() {
-    //     var title = document.getElementById('tripTitle').value.trim();
-    //     var description = document.getElementById('tripDescription').value.trim();
-    //     var date = document.getElementById('tripDate').value.trim();
-
-    //     if(title && description && date) {
-    //         db.collection("trips").add({
-    //             title: title,
-    //             description: description,
-    //             date: date,
-    //             timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    //         })
-    //         .then((docRef) => {
-    //             console.log("Trip document written with ID: ", docRef.id);
-    //             loadTrips(); // Reload the trips
-    //         })
-    //         .catch((error) => {
-    //             console.error("Error adding trip: ", error);
-    //         });
-    //     } else {
-    //         alert('Please enter the title, description, and date for the trip.');
-    //     }
-    // }
-
-  
-
-    function loadTrips() {
+function loadTrips() {
     db.collection("trips").orderBy("timestamp", "desc")
     .get()
     .then((querySnapshot) => {
         var tripsHtml = `
             <div class="col-md-4 mb-3">
                 <div class="card text-center add-trip-card">
-                    <a href="new_trip_form.html" class="card-body">
-                        <h1 class="display-1">+</h1>
+                    <a href="new_trip_form.html" class="card-body text-dark">
+                        <h5>create a new trip ...</h5>
                     </a>
                 </div>
             </div>`;
 
+        let imageCounter = 1; // Initialize counter for image names
         querySnapshot.forEach((doc) => {
             var trip = doc.data();
             var tripId = doc.id; // Assuming each trip has a unique ID
 
+            // Construct the image URL with the counter
+            var imageUrl = `images/sample${imageCounter}.jpg`;
+
             tripsHtml += `
-                <div class="col-md-4 mb-3">
-                    <a href="trip_details.html?id=${tripId}" class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">${trip.title}</h5>
-                            <p class="card-text">${trip.description}</p>
-                            <p class="card-text"><small class="text-muted">${trip.date}</small></p>
-                        </div>
-                    </a>
-                </div>`;
+              <div class="col-md-4 mb-3">
+                <a href="trip_details.html?id=${tripId}" class="card" style="height: 300px; background: linear-gradient(rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.3)), url('${imageUrl}'); background-size: cover;">
+                    <div class="card-body d-flex flex-column justify-content-start align-items-center">
+                        <h5 class="card-title text-dark text-center">${trip.title}</h5>
+                        <p class="text-dark"><small>${trip.date}</small></p>
+                    </div>
+                </a>
+              </div>`;
+
+            // Increment the image counter, reset to 1 if it exceeds 5
+            imageCounter = (imageCounter % 5) + 1;
         });
         document.getElementById('tripsList').innerHTML = `<div class="row">${tripsHtml}</div>`;
+
     });
 }
-
-
-
-    // function loadTrips() {
-    //     db.collection("trips").orderBy("timestamp", "desc")
-    //         .get()
-    //         .then((querySnapshot) => {
-    //             var tripsHtml = '';
-    //             querySnapshot.forEach((doc) => {
-    //                 var trip = doc.data();
-    //                 tripsHtml += '<p><strong>' + trip.title + ':</strong> ' + trip.description + ' - ' + trip.date + '</p>';
-    //             });
-    //             document.getElementById('tripsList').innerHTML = tripsHtml;
-    //         });
-    // }
-
     window.onload = function() {
         loadTrips();
     };
