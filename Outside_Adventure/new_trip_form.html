@@ -17,6 +17,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore-compat.js"></script>
     
+    <!-- firebase user accounts setup -->
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth-compat.js"></script>
+
     <!-- configuration  -->
     <script>
         //Firebase configuration
@@ -32,7 +35,31 @@
     
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+
+        initApp = function() {
+      firebase.auth().onAuthStateChanged(function(user) {
+        loginLink = document.getElementById('loginDropdown');
+        if (user) {
+          // User is signed in.
+          loginLink.textContent = user.displayName || user.email;
+          // loginLink.setAttribute('onclick', 'myProfile()');
+        } else {
+          // User is signed out.
+          loginLink.textContent = 'Log In';
+          // loginLink.setAttribute('onclick', 'signIn()');
+        }
+      }, function(error) {
+        console.log(error);
+      });
+    };
+
+    window.addEventListener('load', function() {
+      initApp()
+    });
+
         </script>
+
+
         
     <!-- Custom CSS -->
     <style>
@@ -45,17 +72,22 @@
 
 <!-- Header -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="leggett.cc/Outside_Adventure/index.html">Golden Backcountry Skiing Adventures</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-        <ul class="navbar-nav">
-            <li class="nav-item">
-              <div id="signIn" onclick="signIn()">Sign in</div>
-            </li>
-        </ul>
-    </div>
+<a class="navbar-brand" href="index.html">Golden Backcountry Skiing Adventures</a>
+<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+    <ul class="navbar-nav">
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" role="button" id="loginDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Log In</a>
+        <div class="dropdown-menu" aria-labelledby="loginDropdown">
+        <a class="dropdown-item" href="javascript:void(0)" onclick="signIn()">Sign in</a>
+        <a class="dropdown-item" href="profile.html">Profile</a>
+        <a class="dropdown-item" href="javascript:void(0)" onclick="signOut()">Log Out</a>
+        </div>
+    </li>
+    </ul>
+</div>
 </nav>
 
 <!-- Add Trip Form -->
@@ -75,18 +107,54 @@
         class="form-control mb-2" title="The tooltip info"></textarea>
         <input type="date" id="tripDate" class="form-control mb-2">
         <input type="number" id="tripMaxParticipants" placeholder="Max Participants" class="form-control mb-2">
+        <input type="hidden" id="tripOrganizer" name="organizer">
+        <input type="hidden" id="tripOrganizerId" name="organizerId">
         <button onclick="postTrip()" class="btn btn-primary">Add Trip</button>
         <a href="index.html">I changed my mind, go back to existing Trips</a>
+
+        
     </div>
+    <!-- <button onclick="logCurrentUser()" class="btn btn-primary">debug whats my user name?</button> -->
 </div>
 
+<!-- Footer -->
+<footer class="bg-light text-center py-3 fixed-bottom w-100">
+    website design by Ryan
+  </footer>
+
 <script>
+    // debug the current user
+    function logCurrentUser() {
+        console.log('trying...');
+        var user = firebase.auth().currentUser;
+        if (user) {
+            // User is signed in, log user information to the console
+            console.log('Current User:', user);
+        } else {
+            // No user is signed in
+            console.log('No user is currently signed in');
+        }
+    }
+
     // Function to add a trip to Firebase
     function postTrip() {
         var title = document.getElementById('tripTitle').value.trim();
         var description = document.getElementById('tripDescription').value.trim();
         var date = document.getElementById('tripDate').value.trim();
         var tripMaxParticipants = document.getElementById('tripMaxParticipants').value.trim();
+
+        //get the current user
+        var user = firebase.auth().currentUser;
+        if (user) {
+            // Set the trip organizer field
+            document.getElementById('tripOrganizer').value = user.displayName;
+            document.getElementById('tripOrganizerId').value = user.uid;
+
+            // ... existing code to post the trip data ...
+        } else {
+            alert('You must be signed in to create a trip.');
+            return;
+        }
 
         if(title && description && date) {
             db.collection("trips").add({
@@ -95,7 +163,9 @@
                 date: date,
                 maxParticipants: tripMaxParticipants ? parseInt(tripMaxParticipants) : null,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                participants: [] // Initialize with empty array
+                participants: [], // Initialize with empty array
+                organizer: user.displayName,
+                organizerId: user.uid
             })
             .then((docRef) => {
                 console.log("Trip document written with ID: ", docRef.id);
@@ -108,6 +178,8 @@
             alert('Please enter the title, description, and date for the trip.');
         }
     }
+
+
 </script>
 
 </body>
