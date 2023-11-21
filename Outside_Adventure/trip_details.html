@@ -38,18 +38,15 @@
 
       firebase.initializeApp(firebaseConfig);
       const db = firebase.firestore();
-    </script>
-
-    <!-- script for logging in and out -->
-    <script>
-      //sign in function
-      function signIn() {
-        var ui = new firebaseui.auth.AuthUI(firebase.auth());
+    //sign in function
+    function signIn() {
+        var ui = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(firebase.auth());
 
         var uiConfig = {
           callbacks: {
             signInSuccessWithAuthResult: function(authResult, redirectUrl) {
               // User successfully signed in.
+              $('#firebaseAuthModal').modal('hide');
               // Return type determines whether we continue the redirect automatically
               // or whether we leave that to developer to handle.
               return false;
@@ -66,18 +63,19 @@
           signInOptions: [
             // List of OAuth providers supported.
             firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-            // firebase.auth.FacebookAuthProvider.PROVIDER_ID,
             firebase.auth.EmailAuthProvider.PROVIDER_ID
             // Add other providers as needed.
           ],
           // Other config options...
         };
 
-        // The start method will wait until the DOM is loaded to instantiate the FirebaseUI widget.
+        // The start method will instantiate the FirebaseUI widget.
         ui.start('#firebaseui-auth-container', uiConfig);
+
+        // Show the modal
+        $('#firebaseAuthModal').modal('show');
       }
       
-      <!-- signing out -->
     // Sign Out Function
     function signOut() {
         firebase.auth().signOut().then(() => {
@@ -88,6 +86,27 @@
             console.error('Error signing out: ', error);
         });
     }
+
+    initApp = function() {
+      firebase.auth().onAuthStateChanged(function(user) {
+        loginLink = document.getElementById('signInDropdown');
+        if (user) {
+          // User is signed in.
+          loginLink.textContent = user.displayName || user.email;
+          // loginLink.setAttribute('onclick', 'myProfile()');
+        } else {
+          // User is signed out.
+          loginLink.textContent = 'Sign In';
+          // loginLink.setAttribute('onclick', 'signIn()');
+        }
+      }, function(error) {
+        console.log(error);
+      });
+    };
+
+    window.addEventListener('load', function() {
+      initApp()
+    });
 
     </script>
 
@@ -172,6 +191,23 @@
   <textarea id="messageInput" class="form-control mb-2" placeholder="Type your message here..."></textarea>
   <button onclick="postMessage()" class="btn btn-primary">Post Message</button>
 </div>
+
+  <!-- FirebaseUI Authentication Modal -->
+  <div class="modal fade" id="firebaseAuthModal" tabindex="-1" role="dialog" aria-labelledby="firebaseAuthModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="firebaseAuthModalLabel">Sign In</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="firebaseui-auth-container"></div>
+            </div>
+        </div>
+    </div>
+  </div>
 
 <!-- Footer -->
 <footer class="bg-light text-center py-3 fixed-bottom w-100">
@@ -260,8 +296,6 @@
             document.getElementById('tripDetails').innerHTML = '<p>Trip ID not found.</p>';
         }
     }
-
-
 
     function getTripIdFromUrl() {
         const urlParams = new URLSearchParams(window.location.search);

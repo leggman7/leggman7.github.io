@@ -100,15 +100,18 @@
     <div class="card-body">
         <!-- Form content here -->
         <input type="text" id="tripTitle" placeholder="Trip Title" class="form-control mb-2">
-        <textarea id="tripDescription" rows="12" placeholder="Here are some suggested details to add:&#10;
-        Trip Location: Mention the primary location of the trip and any key landmarks or attractions.&#10;
-        Meetup Location: Provide clear details about where and when participants should gather.&#10;
-        Difficulty Level: Indicate the level of difficulty (e.g., easy, moderate, hard) to set the right expectations.&#10;
-        Required Skills: List any specific skills or experience needed for the trip.&#10;
-        Weather and Conditions: Give an overview of expected weather conditions and terrain.&#10;
-        Recommended Gear: Suggest appropriate clothing and equipment that participants should bring.&#10;
-        Additional Details: Include any other information that would be helpful for participants to know, such as duration, wildlife encounters, scenic spots, etc.&#10;" 
-        class="form-control mb-2" title="The tooltip info"></textarea>
+        <textarea id="tripDescription" rows="12" placeholder="" class="form-control mb-2" title="The tooltip info">
+It is suggested to keep the below headings and fill in the rest with your trip details.
+
+Pre-meet date and location: always a great idea especially if you don't know the other participants well or doing a complex trip.
+Meetup Location: Provide clear details about where and when participants should gather.
+Trip Location: Mention the primary location of the trip and any key landmarks or attractions.
+Difficulty Level: Indicate the level of difficulty (e.g., easy, moderate, hard) to set the right expectations.
+Required Skills: List any specific skills or experience needed for the trip.
+Weather and Conditions: Give an overview of expected weather conditions and terrain.
+Recommended Gear: Suggest appropriate clothing and equipment that participants should bring.
+Additional Details: Include any other information that would be helpful for participants to know, such as duration, wildlife encounters, scenic spots, etc.
+        </textarea>
         <input type="date" id="tripDate" class="form-control mb-2">
         <input type="number" id="tripMaxParticipants" placeholder="Max Participants" class="form-control mb-2">
         <input type="hidden" id="tripOrganizer" name="organizer">
@@ -116,6 +119,16 @@
         <button onclick="postTrip()" class="btn btn-primary">Add Trip</button>
         <a href="index.html">I changed my mind, go back to existing Trips</a>
 
+<!--         
+        need to add  the following somewhere:
+        Here are some suggested details to add:&#10;
+        Trip Location: Mention the primary location of the trip and any key landmarks or attractions.&#10;
+        Meetup Location: Provide clear details about where and when participants should gather.&#10;
+        Difficulty Level: Indicate the level of difficulty (e.g., easy, moderate, hard) to set the right expectations.&#10;
+        Required Skills: List any specific skills or experience needed for the trip.&#10;
+        Weather and Conditions: Give an overview of expected weather conditions and terrain.&#10;
+        Recommended Gear: Suggest appropriate clothing and equipment that participants should bring.&#10;
+        Additional Details: Include any other information that would be helpful for participants to know, such as duration, wildlife encounters, scenic spots, etc.&#10;"  -->
         
     </div>
     <!-- <button onclick="logCurrentUser()" class="btn btn-primary">debug whats my user name?</button> -->
