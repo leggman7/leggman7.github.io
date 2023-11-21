@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile - Backcountry Skiing Adventures</title>
+    <title>Profile - Golden Outside Adventure</title>
     
     <!-- Bootstrap CSS CDN -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -22,6 +22,10 @@
 
     <script src="https://www.gstatic.com/firebasejs/ui/6.1.0/firebase-ui-auth.js"></script>
     <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.1.0/firebase-ui-auth.css" />
+
+    <!-- MD5 for Gravatar -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+
 
     <!-- configuration  -->
     <script>
@@ -48,9 +52,12 @@
 </head>
 <body>
 
-  <!-- Header -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="index.html">Golden Backcountry Skiing Adventures</a>
+<!-- Header -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="index.html">
+      <div style="font-weight: bold; font-size: 24px;">GOA</div>
+      <div style="font-size: 12px;">Golden Outside Adventure</div>
+    </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -67,9 +74,11 @@
       </ul>
     </div>
   </nav>
+  
 
 <div class="container mt-5">
     <h1>User Profile</h1>
+    <img id="gravatarImage" src="" alt="Gravatar" class="img-fluid rounded-circle">
     <div id="profileInfo" class="mt-3">
         <p><strong>Name:</strong> <span id="userName"></span></p>
         <p><strong>Email:</strong> <span id="userEmail"></span></p>
@@ -78,17 +87,32 @@
 
 <a href="index.html">back to home</a>
 
+<!-- Footer -->
+<footer class="bg-light text-center py-3 fixed-bottom w-100">
+    <a href="about.html">about</a> | website design by Ryan
+  </footer>
+
 <script>
     firebase.auth().onAuthStateChanged((user) => {
         if (user) {
             // User is signed in, show user information
             document.getElementById('userName').textContent = user.displayName || 'No name provided';
             document.getElementById('userEmail').textContent = user.email;
+            setGravatarImage(user.email);
         } else {
             // No user is signed in, redirect to the login page
             window.location.href = 'login.html'; // Redirect to login page
         }
     });
+
+    function setGravatarImage(email) {
+        var trimmedEmail = email.trim().toLowerCase();
+        var hash = CryptoJS.MD5(trimmedEmail);
+        var gravatarUrl = `https://www.gravatar.com/avatar/${hash}?d=identicon`;
+
+        document.getElementById('gravatarImage').src = gravatarUrl;
+    }
+
 </script>
 
 </body>
