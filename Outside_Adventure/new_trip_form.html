@@ -186,7 +186,7 @@ Additional Details: Include any other information that would be helpful for part
             })
             .then((docRef) => {
                 console.log("Trip document written with ID: ", docRef.id);
-                window.location.href = 'index.html'; // Redirect after adding the trip
+                window.location.href = `trip_details.html?id=${docRef.id}`;
             })
             .catch((error) => {
                 console.error("Error adding trip: ", error);

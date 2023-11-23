@@ -114,11 +114,14 @@
     <script type="text/javascript">
       initApp = function() {
         firebase.auth().onAuthStateChanged(function(user) {
+          const profileLink = document.getElementById('userProfileLink');
+
           if (user) {
             // User is signed in.
             var displayName = user.displayName;
             var email = user.email;
             var uid = user.uid;
+            profileLink.href = `profile.html?userid=${user.uid}`;
             user.getIdToken().then(function(accessToken) {
               document.getElementById('signInDropdown').textContent = displayName
 
@@ -160,7 +163,7 @@
         <a class="nav-link dropdown-toggle" href="#" role="button" id="signInDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Log In</a>
         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="signInDropdown">
           <a class="dropdown-item" href="javascript:void(0)" onclick="signIn()">Sign in</a>
-          <a class="dropdown-item" href="profile.html">Profile</a>
+          <a class="dropdown-item" id="userProfileLink" href="#">Profile</a>
           <a class="dropdown-item" href="javascript:void(0)" onclick="signOut()">Log Out</a>
         </div>
       </li>
@@ -216,37 +219,49 @@
 
 <script>
 
-    function getTripDetails(tripId) {
-      db.collection("trips").doc(tripId).get().then((doc) => {
+function getTripDetails(tripId) {
+    db.collection("trips").doc(tripId).get().then(async (doc) => {
         if (doc.exists) {
             const tripData = doc.data();
             const currentUser = firebase.auth().currentUser;
 
-            let isOrganizer = currentUser && ( currentUser.uid === tripData.organizerId);
-            
-            console.log(`Current User:${currentUser}`)
+            let isOrganizer = currentUser && (currentUser.uid === tripData.organizerId);
             let organizerText = isOrganizer ? "<h3>You are the Trip Organizer</h3>" : "";
 
-            let participantsList = '';
+            // Function to fetch user names and create profile links
+            async function getUserProfileLinks(userIds) {
+                const links = await Promise.all(userIds.map(userId => 
+                    db.collection("users").doc(userId).get().then(userDoc => 
+                        userDoc.exists ? `<a href="profile.html?userid=${userId}">${userDoc.data().name}</a>` : "Unknown User"
+                    )
+                ));
+                return links;
+            }
 
-            // Check if participants data exists and is an array
+            let participantsList = '';
             if (Array.isArray(tripData.participants)) {
-                participantsList = tripData.participants.map(participant => 
-                    `<li>${participant}</li>`).join('');
+                const participantLinks = await getUserProfileLinks(tripData.participants);
+                participantsList = participantLinks.map(link => `<li>${link}</li>`).join('');
             } else {
                 participantsList = '<li>No participants yet</li>';
             }
-            
+
             let joinRequestsList = '';
-            if (isOrganizer && Array.isArray(tripData.joinRequests)) {
-                joinRequestsList = tripData.joinRequests.map((request, index) => 
-                    `<li>${request} <button onclick="acceptJoinRequest('${tripId}', '${request}', ${index})">Accept</button></li>`).join('');
+            if (Array.isArray(tripData.joinRequests)) {
+                const joinRequestLinks = await getUserProfileLinks(tripData.joinRequests);
+                joinRequestsList = joinRequestLinks.map((link, index) => {
+                    if (isOrganizer) {
+                        return `<li>${link} <button onclick="acceptJoinRequest('${tripId}', '${tripData.joinRequests[index]}', ${index})">Accept</button></li>`;
+                    } else {
+                        return `<li>${link}</li>`;
+                    }
+                }).join('');
             }
 
             document.getElementById('tripDetails').innerHTML = `
                 ${organizerText}
                 <h2>${tripData.title}</h2>
-                <p>${tripData.description}</p>
+                <p style="white-space: pre-wrap">${tripData.description}</p>
                 <p><strong>Date:</strong> ${tripData.date}</p>
                 <p><strong>Organizer:</strong> ${tripData.organizer}</p>
                 <h3>Participants (Max ${tripData.maxParticipants}):</h3>
@@ -260,7 +275,9 @@
     }).catch((error) => {
         console.log("Error getting document:", error);
     });
-    }
+}
+
+
 
     function acceptJoinRequest(tripId, request, index) {
     const tripRef = db.collection("trips").doc(tripId);
@@ -302,50 +319,69 @@
         return urlParams.get('id'); // Assuming the URL param for the trip ID is 'id'
     }
 
-    function requestJoin(tripId) {
-      const user = firebase.auth().currentUser;
+function requestJoin(tripId) {
+    const user = firebase.auth().currentUser;
 
-      if (user) {
+    if (user) {
         // User is signed in, proceed to check trip details
         const tripRef = db.collection("trips").doc(tripId);
 
-        tripRef.update({
-            joinRequests: firebase.firestore.FieldValue.arrayUnion(user.displayName || user.email)
-            }).then(() => {
-                console.log("Join request added");
-                // Optionally, update the UI to reflect the change
-            }).catch((error) => {
-                console.error("Error making join request: ", error);
+        tripRef.get().then((doc) => {
+            if (doc.exists) {
+                const tripData = doc.data();
+                const joinRequests = tripData.joinRequests || [];
 
-            });
-      } else {
+                if (!joinRequests.includes(user.uid)) {
+                    // User ID not in joinRequests, proceed to add
+                    tripRef.update({
+                        joinRequests: firebase.firestore.FieldValue.arrayUnion(user.uid)
+                    }).then(() => {
+                        console.log("Join request added");
+                        // Optionally, update the UI to reflect the change
+                    }).catch((error) => {
+                        console.error("Error making join request: ", error);
+                    });
+                } else {
+                    console.log("User has already requested to join this trip");
+                    alert('You have already requested to join this trip!');
+                }
+            } else {
+                console.log("Trip not found");
+                // Handle the scenario where the trip document doesn't exist
+            }
+        }).catch((error) => {
+            console.error("Error fetching trip details: ", error);
+        });
+    } else {
         // No user is signed in
         console.log("User not signed in");
         // Handle the scenario when the user is not logged in
         alert('You must be signed in to request to join a trip.');
-      }
-  }
+    }
+}
 
-    function abandonTrip(tripId) {
-            const user = firebase.auth().currentUser;
-            if (user) {
-                // User is signed in, proceed to remove them from the trip
-                const tripRef = db.collection("trips").doc(tripId);
 
-                tripRef.update({
-                    participants: firebase.firestore.FieldValue.arrayRemove(user.displayName || user.email)
-                }).then(() => {
-                    console.log("User removed from trip");
-                    // Optionally, update the UI or redirect
-                }).catch((error) => {
-                    console.error("Error abandoning trip: ", error);
-                });
-            } else {
-                // No user is signed in
-                console.log("User not signed in");
-                // Handle the scenario when the user is not logged in
-            }
-        }
+function abandonTrip(tripId) {
+    const user = firebase.auth().currentUser;
+    if (user) {
+        // User is signed in, proceed to remove them from the trip
+        const tripRef = db.collection("trips").doc(tripId);
+
+        tripRef.update({
+            participants: firebase.firestore.FieldValue.arrayRemove(user.uid)
+        }).then(() => {
+            console.log("User removed from trip");
+            // Optionally, update the UI or redirect
+        }).catch((error) => {
+            console.error("Error abandoning trip: ", error);
+        });
+    } else {
+        // No user is signed in
+        console.log("User not signed in");
+        // Handle the scenario when the user is not logged in
+    }
+}
+
 
     // Function to post a message
     function postMessage() {

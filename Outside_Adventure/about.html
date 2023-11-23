@@ -94,6 +94,7 @@
       if (user) {
         // User is signed in.
         loginLink.textContent = user.displayName || user.email;
+        profileLink.href = `profile.html?userid=${user.uid}`;
         // loginLink.setAttribute('onclick', 'myProfile()');
       } else {
         // User is signed out.
@@ -127,7 +128,7 @@
         <a class="nav-link dropdown-toggle" href="#" role="button" id="signInDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Log In</a>
         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="signInDropdown">
           <a class="dropdown-item" href="javascript:void(0)" onclick="signIn()">Sign in</a>
-          <a class="dropdown-item" href="profile.html">Profile</a>
+          <a class="dropdown-item" id="userProfileLink" href="#">Profile</a>
           <a class="dropdown-item" href="javascript:void(0)" onclick="signOut()">Log Out</a>
         </div>
       </li>

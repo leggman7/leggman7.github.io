@@ -90,51 +90,24 @@
 
     initApp = function() {
       firebase.auth().onAuthStateChanged(function(user) {
-        // update the menu to say users name
         loginLink = document.getElementById('signInDropdown');
-        const profileLink = document.getElementById('userProfileLink');
-
         if (user) {
+          // User is signed in.
           loginLink.textContent = user.displayName || user.email;
-          profileLink.href = `profile.html?userid=${user.uid}`;
+          // loginLink.setAttribute('onclick', 'myProfile()');
         } else {
+          // User is signed out.
           loginLink.textContent = 'Menu';
+          // loginLink.setAttribute('onclick', 'signIn()');
         }
-
-        // add the user to the database if they are not already
-        if (user) {
-            const db = firebase.firestore();
-
-
-            // Check if user already exists in the Firestore database
-            db.collection('users').doc(user.uid).get().then((docSnapshot) => {
-                if (!docSnapshot.exists) {
-                    // User does not exist, add them to the database
-                    db.collection('users').doc(user.uid).set({
-                        name: user.displayName || 'Anonymous', // Use the display name, default to 'Anonymous'
-                        email: user.email // User's email address
-                        // You can add more user properties here
-                    })
-                    .then(() => {
-                        console.log('New user added to Firestore');
-                    })
-                    .catch((error) => {
-                        console.error('Error adding user to Firestore:', error);
-                    });
-                }
-            });
-        } else {
-            // No user is signed in
-            console.log('User is not signed in');
-        }
-      }
-    )};
+      }, function(error) {
+        console.log(error);
+      });
+    };
 
     window.addEventListener('load', function() {
       initApp()
     });
-
-
   </script>
 
 </head>
@@ -156,7 +129,7 @@
         <div class="nav-link dropdown-toggle" href="#" role="button" id="signInDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Menu</div>
         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="signInDropdown">
           <a class="dropdown-item" href="javascript:void(0)" onclick="signIn()">Sign in</a>
-          <a class="dropdown-item" id="userProfileLink" href="#">Profile</a>
+          <a class="dropdown-item" href="profile.html">Profile</a>
           <a class="dropdown-item" href="javascript:void(0)" onclick="signOut()">Sign Out</a>
         </div>
       </li>
@@ -166,7 +139,9 @@
 
   <!-- Tagline -->
   <div class="container text-center my-4">
-    <h2>Connect with fellow adventurers to explore and <br><em>share the journey together</em></h2>
+    <h2>Setup</em></h2>
+    <button type="button" class="btn btn-primary" onclick="writeSkillsToFirebase()">Add Skills to Database</button>
+    <button type="button" class="btn btn-primary" onlcick="createUserProfile()">Create User Profile</button>
   </div>
 
   <!-- List of Current Trips -->
@@ -260,6 +235,83 @@ function createNewTrip() {
         alert('You must be signed in to create a new adventure');
     }
 }
+
+function myProfile() {
+        // Redirect to profile page or perform other actions
+        window.location.href = 'profile.html';
+    }
+
+function writeSkillsToFirebase() {
+    const db = firebase.firestore();
+    const skills = [
+        {
+            name: 'AST 1 (Avalanche Safety Training 1)',
+            description: 'Introductory course covering basics of avalanche formation, decision making, and rescue.'
+        },
+        {
+            name: 'AST 2 (Avalanche Safety Training 2)',
+            description: 'Advanced course focusing on snow science, terrain analysis, and group management in avalanche terrain.'
+        },
+        {
+            name: 'Glacier Travel',
+            description: 'Skills for safe navigation and travel in glacier terrain, including crevasse rescue techniques.'
+        },
+        {
+            name: 'Mapping',
+            description: 'Reading and understanding topographic maps and navigation tools for backcountry settings.'
+        },
+        {
+            name: 'Trip Leader',
+            description: 'Leadership skills for planning and leading group tours, including route selection and group dynamics.'
+        },
+        {
+            name: 'Rappelling',
+            description: 'Techniques for safely descending steep or vertical terrain.'
+        },
+        {
+            name: 'Mountaineering',
+            description: 'Combining hiking, rock climbing, and glacier travel to traverse mountainous terrain.'
+        },
+        {
+            name: 'First Aid',
+            description: 'Medical skills for addressing injuries or illnesses in remote environments.'
+        }
+    ];
+
+    skills.forEach(skill => {
+        db.collection('availableSkills').add(skill)
+            .then(docRef => console.log('Skill written with ID: ', docRef.id))
+            .catch(error => console.error('Error adding skill: ', error));
+    });
+}
+
+function createUserProfile() {
+    // Get the current user from Firebase Authentication
+    const user = firebase.auth().currentUser;
+
+    if (user) {
+        // User is signed in
+        const db = firebase.firestore();
+        const userProfile = {
+            name: user.displayName || 'Anonymous', // Use a default name if displayName is not available
+            email: user.email,
+            // Add any other user fields you need
+        };
+
+        // Add or update the user profile in the 'users' collection with the user's UID as the document ID
+        db.collection('users').doc(user.uid).set(userProfile, { merge: true })
+            .then(() => {
+                console.log('User profile created or updated successfully');
+            })
+            .catch((error) => {
+                console.error('Error creating or updating user profile:', error);
+            });
+    } else {
+        // No user is signed in
+        console.log('No user is currently signed in');
+    }
+}
+
 
 
 </script>
