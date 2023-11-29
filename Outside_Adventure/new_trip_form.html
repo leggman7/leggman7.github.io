@@ -112,6 +112,8 @@ Weather and Conditions: Give an overview of expected weather conditions and terr
 Recommended Gear: Suggest appropriate clothing and equipment that participants should bring.
 Additional Details: Include any other information that would be helpful for participants to know, such as duration, wildlife encounters, scenic spots, etc.
         </textarea>
+        <input type="number" class="form-control mb-2" id="tripElevation" name="elevation" placeholder="Enter the estimated elevation" required>
+        <input type="number" class="form-control mb-2" id="tripDistance" name="distance" placeholder="Enter the estimated distance" required>
         <input type="date" id="tripDate" class="form-control mb-2">
         <input type="number" id="tripMaxParticipants" placeholder="Max Participants" class="form-control mb-2">
         <input type="hidden" id="tripOrganizer" name="organizer">
@@ -157,8 +159,10 @@ Additional Details: Include any other information that would be helpful for part
     function postTrip() {
         var title = document.getElementById('tripTitle').value.trim();
         var description = document.getElementById('tripDescription').value.trim();
-        var date = document.getElementById('tripDate').value.trim();
+        var dateString = document.getElementById('tripDate').value.trim(); // This will be in YYYY-MM-DD format
         var tripMaxParticipants = document.getElementById('tripMaxParticipants').value.trim();
+        var elevation = document.getElementById('tripElevation').value.trim();
+      var distance = document.getElementById('tripDistance').value.trim();
 
         //get the current user
         var user = firebase.auth().currentUser;
@@ -173,16 +177,20 @@ Additional Details: Include any other information that would be helpful for part
             return;
         }
 
-        if(title && description && date) {
+        if(title && description) {
+          var date = new Date(`${dateString}T12:00:00Z`); //should fix this time zone issue
+          var firestoreTimestamp = firebase.firestore.Timestamp.fromDate(date);
             db.collection("trips").add({
                 title: title,
                 description: description,
-                date: date,
+                date: firestoreTimestamp, // Use Firestore Timestamp
                 maxParticipants: tripMaxParticipants ? parseInt(tripMaxParticipants) : null,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                 participants: [], // Initialize with empty array
                 organizer: user.displayName,
-                organizerId: user.uid
+                organizerId: user.uid,
+                elevation: elevation ? parseInt(elevation) : null,
+                distance: distance ? parseFloat(distance) : null
             })
             .then((docRef) => {
                 console.log("Trip document written with ID: ", docRef.id);

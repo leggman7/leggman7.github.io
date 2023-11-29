@@ -29,21 +29,20 @@
 
     <!-- configuration  -->
     <script>
-        //Firebase configuration
-        const firebaseConfig = {
-          apiKey: "AIzaSyDTQclDt55t66KZXkOfxLIWp2TXLvOIPKk",
-          authDomain: "outdoor-adventures-2750f.firebaseapp.com",
-          projectId: "outdoor-adventures-2750f",
-          storageBucket: "outdoor-adventures-2750f.appspot.com",
-          messagingSenderId: "359398860553",
-          appId: "1:359398860553:web:2aa1ea223bdd736a4e15d8",
-          measurementId: "G-8DTZBX35L9"
-          };
+      //Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDTQclDt55t66KZXkOfxLIWp2TXLvOIPKk",
+        authDomain: "outdoor-adventures-2750f.firebaseapp.com",
+        projectId: "outdoor-adventures-2750f",
+        storageBucket: "outdoor-adventures-2750f.appspot.com",
+        messagingSenderId: "359398860553",
+        appId: "1:359398860553:web:2aa1ea223bdd736a4e15d8",
+        measurementId: "G-8DTZBX35L9"
+        };
 
-        firebase.initializeApp(firebaseConfig);
+      firebase.initializeApp(firebaseConfig);
       const db = firebase.firestore();
 
-      //sign in function
       function signIn() {
         var ui = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(firebase.auth());
 
@@ -81,39 +80,40 @@
         $('#firebaseAuthModal').modal('show');
       }
       
-    // Sign Out Function
-    function signOut() {
-        firebase.auth().signOut().then(() => {
-            console.log('User signed out');
-            // Handle sign-out success (e.g., redirecting to a login page)
-        }).catch((error) => {
-            // Handle errors
-            console.error('Error signing out: ', error);
+      // Sign Out Function
+      function signOut() {
+          firebase.auth().signOut().then(() => {
+              console.log('User signed out');
+              // Handle sign-out success (e.g., redirecting to a login page)
+          }).catch((error) => {
+              // Handle errors
+              console.error('Error signing out: ', error);
+          });
+      }
+
+      initApp = function() {
+        firebase.auth().onAuthStateChanged(function(user) {
+          loginLink = document.getElementById('signInDropdown');
+          const profileLink = document.getElementById('userProfileLink');
+          
+          if (user) {
+            // User is signed in.
+            loginLink.textContent = user.displayName || user.email;
+            profileLink.href = `profile.html?userid=${user.uid}`;
+          } else {
+            // User is signed out.
+            loginLink.textContent = 'Menu';
+            // loginLink.setAttribute('onclick', 'signIn()');
+          }
+        }, function(error) {
+          console.log(error);
         });
-    }
+      };
 
-    initApp = function() {
-      firebase.auth().onAuthStateChanged(function(user) {
-        loginLink = document.getElementById('signInDropdown');
-        const profileLink = document.getElementById('userProfileLink');
-        
-        if (user) {
-          // User is signed in.
-          loginLink.textContent = user.displayName || user.email;
-          profileLink.href = `profile.html?userid=${user.uid}`;
-        } else {
-          // User is signed out.
-          loginLink.textContent = 'Menu';
-          // loginLink.setAttribute('onclick', 'signIn()');
-        }
-      }, function(error) {
-        console.log(error);
+      window.addEventListener('load', function() {
+        initApp()
       });
-    };
 
-    window.addEventListener('load', function() {
-      initApp()
-    });
       </script>
 
     <!-- Custom CSS -->
@@ -122,112 +122,116 @@
             padding: 20px;
         }
     </style>
+
 </head>
 <body>
 
-<!-- Header -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="index.html">
-      <div style="font-weight: bold; font-size: 24px;">GOA</div>
-      <div style="font-size: 12px;">Golden Outside Adventure</div>
-    </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-      <ul class="navbar-nav">
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" id="signInDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Log In</a>
-          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="signInDropdown">
-            <a class="dropdown-item" href="javascript:void(0)" onclick="signIn()">Sign in</a>
-            <a class="dropdown-item" id="userProfileLink" href="#">Profile</a>
-            <a class="dropdown-item" href="javascript:void(0)" onclick="signOut()">Log Out</a>
-          </div>
-        </li>
-      </ul>
-    </div>
+  <!-- Header -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="index.html">
+        <div style="font-weight: bold; font-size: 24px;">GOA</div>
+        <div style="font-size: 12px;">Golden Outside Adventure</div>
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" id="signInDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Log In</a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="signInDropdown">
+              <a class="dropdown-item" href="javascript:void(0)" onclick="signIn()">Sign in</a>
+              <a class="dropdown-item" id="userProfileLink" href="#">Profile</a>
+              <a class="dropdown-item" href="javascript:void(0)" onclick="signOut()">Log Out</a>
+            </div>
+          </li>
+        </ul>
+      </div>
   </nav>
   
-
-<div class="container mt-5">
+  <!-- Profile -->
+  <div class="container mt-5">
     <h1>User Profile</h1>
     <img id="gravatarImage" src="" alt="Gravatar" class="img-fluid rounded-circle">
     <div id="profileInfo" class="mt-3">
-        <p><strong>Name:</strong> <span id="userName"></span></p>
-        <p><strong>Email:</strong> <span id="userEmail"></span></p>
-        <p><strong>Description:</strong> <span id="userDescription">todo</span></p>
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#descriptionModal">
-            Add Description
-        </button>
-    </div>
+      <p><strong>Name:</strong> <span id="userName"></span></p>
+      <p><strong>Email:</strong> <span id="userEmail"></span></p>
+      <p><strong>Description:</strong> <span id="userDescription">todo</span></p>
+      <p><strong>Total Elevation:</strong> <span id="totalElevation"></span></p>
+      <p><strong>Total Distance:</strong> <span id="totalDistance"></span></p>
+    
+      <button type="button" id="addDescriptionButton" class="btn btn-primary d-none" data-toggle="modal" data-target="#descriptionModal">
+          Add Description
+      </button>
+  </div>
 
-<!-- Description Modal -->
-<div class="modal fade" id="descriptionModal" tabindex="-1" aria-labelledby="descriptionModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="descriptionModalLabel">User Description</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <textarea id="userDescription" class="form-control" placeholder="Your description..."></textarea>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="addUserDescription()">Save</button>
-            </div>
-        </div>
-    </div>
-</div>
+  <!-- Description Modal -->
+  <div class="modal fade" id="descriptionModal" tabindex="-1" aria-labelledby="descriptionModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="descriptionModalLabel">User Description</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <textarea id="userAddDescription" class="form-control" placeholder="Your description..."></textarea>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary" onclick="addUserDescription()">Save</button>
+              </div>
+          </div>
+      </div>
+  </div>
 
-    <!-- User Skills Section -->
-    <section id="userSkills">
-        <h2>Skills</h2>
-        <ul id="userSkillsList">
-            <!-- User skills will be listed here -->
-            <!-- Example: <li>Skiing</li> -->
-            <!-- This list can be populated dynamically based on user data -->
-        </ul>
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#skillsModal">
-            Add Skill
-        </button>
+  <!-- User Skills Section -->
+  <section id="userSkills">
+      <h2>Skills</h2>
+      <ul id="userSkillsList">
+          <!-- User skills will be listed here -->
+          <!-- Example: <li>Skiing</li> -->
+          <!-- This list can be populated dynamically based on user data -->
+      </ul>
+      <button type="button" id="addSkillsButton" class="btn btn-primary d-none" data-toggle="modal" data-target="#skillsModal">
+          Add Skill
+      </button>
 
-        <!-- Skills Modal -->
-<div class="modal fade" id="skillsModal" tabindex="-1" aria-labelledby="skillsModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="skillsModalLabel">Available Skills</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <ul id="availableSkillsList">
-                    <!-- Firebase skills will be loaded here -->
-                </ul>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
+  <!-- Skills Modal -->
+  <div class="modal fade" id="skillsModal" tabindex="-1" aria-labelledby="skillsModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="skillsModalLabel">Available Skills</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <ul id="availableSkillsList">
+                      <!-- Firebase skills will be loaded here -->
+                  </ul>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+          </div>
+      </div>
+  </div>
 
     </section>
 
-    <!-- Previous Trips Section -->
-    <section id="previousTrips">
-        <h2>Previous Trips</h2>
-        <ul id="tripsList">
-            <!-- List of previous trips will be displayed here -->
-            <!-- Example: <li>Alps Skiing Adventure - Jan 2022</li> -->
-            <!-- This list can be populated dynamically based on user data -->
-        </ul>
-    </section>
-</div>
+  <!-- Previous Trips Section -->
+  <section id="previousTrips">
+      <h2>Previous Trips</h2>
+      <ul id="tripsList">
+          <!-- List of previous trips will be displayed here -->
+          <!-- Example: <li>Alps Skiing Adventure - Jan 2022</li> -->
+          <!-- This list can be populated dynamically based on user data -->
+      </ul>
+  </section>
+</div>  
 
 <!-- Footer -->
 <footer class="bg-light text-center py-3 fixed-bottom w-100">
@@ -235,30 +239,44 @@
 </footer>
 
 <script>
+    const userId = getQueryParameter('userid');
+
+    if (userId) {
+        loadUserProfile(userId);
+        loadUserSkills(userId);
+        loadUserTrips(userId);
+
+        // Fetch the user's email from Firestore and then set the Gravatar image
+        db.collection('users').doc(userId).get().then((doc) => {
+            if (doc.exists) {
+                const userEmail = doc.data().email;
+                setGravatarImage(userEmail); // Set Gravatar image after retrieving the email
+            } else {
+                console.log("User profile not found for Gravatar image");
+            }
+        }).catch((error) => {
+            console.error("Error loading user profile for Gravatar:", error);
+        });
+    } else {
+        console.log('User ID is required in URL parameters');
+    }
+
     firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
-            // User is signed in, show user information
-            loadUserProfile()
-            setGravatarImage(user.email);
-            loadUserSkills()
-
-        } else {
-            // No user is signed in, redirect to the login page
-            window.location.href = 'login.html'; // Redirect to login page
-        }
+      if (user) {
+          if (user.uid === userId) {
+              // Remove 'd-none' class to show the button
+              document.getElementById('addDescriptionButton').classList.remove('d-none');
+              document.getElementById('addSkillsButton').classList.remove('d-none');
+          }
+      } else {
+          // Handle no user logged in scenario
+      }
     });
-
-    
-
-    // Load skills when the modal is about to be shown
-    $('#skillsModal').on('show.bs.modal', loadAvailableSkills);
 
     function getQueryParameter(param) {
         const urlParams = new URLSearchParams(window.location.search);
         return urlParams.get(param);
     }
-
-    const userId = getQueryParameter('userid');
 
     function setGravatarImage(email) {
         var trimmedEmail = email.trim().toLowerCase();
@@ -297,117 +315,119 @@
     }
 
     function addUserSkill(skillId) {
-    // Get the current user from Firebase Authentication
-    const user = firebase.auth().currentUser;
-
-    if (user) {
-        // User is signed in, add skill to user's profile
-        const userSkillsRef = firebase.firestore().collection('users').doc(user.uid).collection('userSkills');
-
-        userSkillsRef.doc(skillId).set({
-
-        })
-            .then(() => {
-                console.log(`Skill ${skillId} added to user ${user.uid}`);
-            })
-            .catch((error) => {
-                console.error('Error adding skill to user:', error);
-            });
-    } else {
-        // No user is signed in
-        console.log('No user is currently signed in');
-    }
-}
-
-    function loadUserSkills() {
+        // Get the current user from Firebase Authentication
         const user = firebase.auth().currentUser;
 
         if (user) {
-            // const db = firebase.firestore();
-            const userSkillsRef = db.collection('users').doc(user.uid).collection('userSkills');
+            // User is signed in, add skill to user's profile
+            const userSkillsRef = firebase.firestore().collection('users').doc(user.uid).collection('userSkills');
 
-            userSkillsRef.get().then((querySnapshot) => {
-                const skillsList = document.getElementById('userSkillsList');
-                skillsList.innerHTML = ''; // Clear existing skills
+            userSkillsRef.doc(skillId).set({
 
-                if (querySnapshot.empty) {
-                    skillsList.innerHTML = '<li>No skills added yet</li>';
-                } else {
-                    querySnapshot.forEach((doc) => {
-                        const skillId = doc.id; // Get skill ID
-
-                        // Fetch skill details from availableSkills
-                        db.collection('availableSkills').doc(skillId).get().then(skillDoc => {
-                            if (skillDoc.exists) {
-                                const skillData = skillDoc.data();
-                                const skillName = skillData.name; // Assuming the skill has a 'name' field
-
-                                // Create a list item for each skill and append it to the skills list
-                                const li = document.createElement('li');
-                                li.textContent = skillName;
-                                skillsList.appendChild(li);
-                            }
-                        }).catch((error) => {
-                            console.error("Error loading skill details:", error);
-                        });
-                    });
-                }
-            }).catch((error) => {
-                console.error("Error loading user's skills:", error);
-            });
+            })
+                .then(() => {
+                    console.log(`Skill ${skillId} added to user ${user.uid}`);
+                })
+                .catch((error) => {
+                    console.error('Error adding skill to user:', error);
+                });
         } else {
+            // No user is signed in
             console.log('No user is currently signed in');
         }
     }
 
-    function loadUserProfile() {
-        const user = firebase.auth().currentUser;
+    function loadUserSkills(userId) {
+        // Reference to the user's skills collection in Firestore
+        const userSkillsRef = db.collection('users').doc(userId).collection('userSkills');
 
-        // code to load the user profile data
-        if (!userId) {
-            console.log("User ID is required");
-            // Handle the absence of user ID appropriately
-            return;
-        }
-        const db = firebase.firestore();
-        db.collection('users').doc(userId).get().then((doc) => {
-            if (doc.exists) {
-                const userData = doc.data();
-                // Update the profile page with user data
-                document.getElementById('userName').textContent = userData.name || 'N/A';
-                document.getElementById('userEmail').textContent = userData.email || 'N/A';
-                document.getElementById('userDescription').textContent = userData.description || 'haha jk';
-                // ... populate other fields ...
+        userSkillsRef.get().then((querySnapshot) => {
+            const skillsList = document.getElementById('userSkillsList');
+            skillsList.innerHTML = ''; // Clear existing skills
+
+            if (querySnapshot.empty) {
+                skillsList.innerHTML = '<li>No skills added yet</li>';
             } else {
-                console.log("User profile not found");
-                // Handle user profile not found
+                querySnapshot.forEach((doc) => {
+                    const skillId = doc.id; // Get skill ID
+
+                    // Fetch skill details from availableSkills
+                    db.collection('availableSkills').doc(skillId).get().then(skillDoc => {
+                        if (skillDoc.exists) {
+                            const skillData = skillDoc.data();
+                            const skillName = skillData.name; // Assuming the skill has a 'name' field
+
+                            // Create a list item for each skill and append it to the skills list
+                            const li = document.createElement('li');
+                            li.textContent = skillName;
+                            skillsList.appendChild(li);
+                        }
+                    }).catch((error) => {
+                        console.error("Error loading skill details:", error);
+                    });
+                });
             }
         }).catch((error) => {
-            console.error("Error loading user profile:", error);
-            // Handle errors
+            console.error("Error loading user's skills:", error);
         });
-
-        // deprecated, this was for showing the logged in user.
-        // if (user) {
-        //     const db = firebase.firestore();
-        //     db.collection('users').doc(user.uid).get().then((doc) => {
-        //         if (doc.exists) {
-        //             const userData = doc.data();
-        //             document.getElementById('userName').textContent = userData.name || 'N/A';
-        //             document.getElementById('userEmail').textContent = userData.email || 'N/A';
-        //             document.getElementById('userDescription').textContent = userData.description || 'haha jk';
-        //         }
-        //     }).catch((error) => {
-        //         console.error('Error loading user profile:', error);
-        //     });
-        // } else {
-        //     console.log('No user is currently signed in');
-        // }
     }
 
+    function loadUserProfile(userId) {
+    // Reference to the user's document in Firestore
+    db.collection('users').doc(userId).get().then((doc) => {
+        if (doc.exists) {
+            const userData = doc.data();
+            // Update the profile page with user data
+            document.getElementById('userName').textContent = userData.name || 'N/A';
+            document.getElementById('userEmail').textContent = userData.email || 'N/A';
+            document.getElementById('userDescription').textContent = userData.description || 'No description provided';
+            // ... populate other fields as needed ...
+
+            // Check if completedTrips field exists and has entries
+            if (userData.completedTrips && userData.completedTrips.length > 0) {
+                // Create a list of promises to get trip details
+                const tripDetailsPromises = userData.completedTrips.map(tripId => 
+                    db.collection("trips").doc(tripId).get()
+                );
+                
+                // Use Promise.all to wait for all the trip detail fetches to complete
+                Promise.all(tripDetailsPromises).then(tripDocs => {
+                    // Calculate the total elevation and distance
+                    const totals = tripDocs.reduce((acc, tripDoc) => {
+                        if (tripDoc.exists) {
+                            const tripData = tripDoc.data();
+                            acc.totalElevation += tripData.elevation || 0;
+                            acc.totalDistance += tripData.distance || 0;
+                        }
+                        return acc;
+                    }, { totalElevation: 0, totalDistance: 0 });
+
+                    // Update the profile page with the total elevation and distance
+                    document.getElementById('totalElevation').textContent = `${totals.totalElevation} meters`;
+                    document.getElementById('totalDistance').textContent = `${totals.totalDistance} kilometers`;
+                }).catch(error => {
+                    console.error("Error getting trip details:", error);
+                });
+            } else {
+                // Handle case where there are no completed trips
+                document.getElementById('totalElevation').textContent = 'no trips yet!';
+                document.getElementById('totalDistance').textContent = 'no trips yet!';
+            }
+
+        } else {
+            console.log("User profile not found");
+            // Handle user profile not found
+        }
+    }).catch((error) => {
+        console.error("Error loading user profile:", error);
+        // Handle errors
+    });
+}
+
+        
     function addUserDescription() {
         const user = firebase.auth().currentUser;
-        const description = document.getElementById('userDescription').value.trim();
+        const description = document.getElementById('userAddDescription').value.trim();
 
         if (user && description) {
             const db = firebase.firestore();
@@ -427,6 +447,72 @@
             // Optionally, alert the user that they need to sign in or enter a description
         }
     }
+
+    // deprecated?
+    // function loadUserTrips(userId) {
+    //     db.collection("users").doc(userId).get()
+    //     .then(async doc => {
+    //         if (doc.exists) {
+    //             const userData = doc.data();
+    //             let completedTripsHtml = '';
+    //             if (userData.completedTrips && userData.completedTrips.length > 0) {
+    //                 for (const trip of userData.completedTrips) {
+    //                     const tripDoc = await db.collection("trips").doc(trip.tripId).get();
+    //                     let tripName = tripDoc.exists ? tripDoc.data().title : "Unknown Trip";
+    //                     let tripLink = `trip_details.html?id=${trip.tripId}`;
+    //                     completedTripsHtml += `<li><a href="${tripLink}">Trip Name: ${tripName}</a>, Elevation: ${trip.elevation}, Distance: ${trip.distance}</li>`;
+    //                 }
+    //             } else {
+    //                 completedTripsHtml = '<li>No completed trips yet</li>';
+    //             }
+    //             document.getElementById('tripsList').innerHTML = completedTripsHtml;
+    //         } else {
+    //             console.log("No such user document!");
+    //         }
+    //     })
+    //     .catch(error => {
+    //         console.log("Error getting user document:", error);
+    //     });
+    // }
+    function loadUserTrips(userId) {
+      db.collection("users").doc(userId).get()
+      .then(async doc => {
+          if (doc.exists) {
+              const userData = doc.data();
+              let completedTripsHtml = '';
+              if (userData.completedTrips && userData.completedTrips.length > 0) {
+                  // Create a list of promises to get trip details
+                  const tripDetailsPromises = userData.completedTrips.map(tripId => 
+                      db.collection("trips").doc(tripId).get()
+                  );
+                  
+                  // Wait for all promises to resolve
+                  const tripDetails = await Promise.all(tripDetailsPromises);
+                  
+                  // Generate HTML for each trip
+                  tripDetails.forEach(tripDoc => {
+                      if (tripDoc.exists) {
+                          let tripData = tripDoc.data();
+                          let tripName = tripData.title;
+                          let tripLink = `trip_details.html?id=${tripDoc.id}`;
+                          completedTripsHtml += `<li><a href="${tripLink}">${tripName}</a></li>`;
+                      }
+                  });
+
+              } else {
+                  completedTripsHtml = '<li>No completed trips yet</li>';
+              }
+              document.getElementById('tripsList').innerHTML = completedTripsHtml;
+          } else {
+              console.log("No such user document!");
+          }
+      })
+      .catch(error => {
+          console.log("Error getting user document:", error);
+      });
+  }
+
+
 </script>
 
 </body>
