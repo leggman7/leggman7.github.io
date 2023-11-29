@@ -89,20 +89,45 @@
 
     initApp = function() {
       firebase.auth().onAuthStateChanged(function(user) {
+        // update the menu to say users name
         loginLink = document.getElementById('signInDropdown');
+        const profileLink = document.getElementById('userProfileLink');
+
         if (user) {
-          // User is signed in.
           loginLink.textContent = user.displayName || user.email;
-          // loginLink.setAttribute('onclick', 'myProfile()');
+          profileLink.href = `profile.html?userid=${user.uid}`;
         } else {
-          // User is signed out.
-          loginLink.textContent = 'Sign In';
-          // loginLink.setAttribute('onclick', 'signIn()');
+          loginLink.textContent = 'Menu';
         }
-      }, function(error) {
-        console.log(error);
-      });
-    };
+
+        // add the user to the database if they are not already
+        if (user) {
+            const db = firebase.firestore();
+
+
+            // Check if user already exists in the Firestore database
+            db.collection('users').doc(user.uid).get().then((docSnapshot) => {
+                if (!docSnapshot.exists) {
+                    // User does not exist, add them to the database
+                    db.collection('users').doc(user.uid).set({
+                        name: user.displayName || 'Anonymous', // Use the display name, default to 'Anonymous'
+                        email: user.email // User's email address
+                        // You can add more user properties here
+                    })
+                    .then(() => {
+                        console.log('New user added to Firestore');
+                    })
+                    .catch((error) => {
+                        console.error('Error adding user to Firestore:', error);
+                    });
+                }
+            });
+        } else {
+            // No user is signed in
+            console.log('User is not signed in');
+        }
+      }
+    )};
 
     window.addEventListener('load', function() {
       initApp()
@@ -171,6 +196,22 @@
   </div>
 </nav>
 
+<!-- FirebaseUI Authentication Modal -->
+<div class="modal fade" id="firebaseAuthModal" tabindex="-1" role="dialog" aria-labelledby="firebaseAuthModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="firebaseAuthModalLabel">Sign In</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+          </div>
+          <div class="modal-body">
+              <div id="firebaseui-auth-container"></div>
+          </div>
+      </div>
+  </div>
+  </div> 
 
 <!-- trip details -->
 <div class="container mt-4">
@@ -231,28 +272,6 @@
   </div>
 </div>
 
-<!-- Trip Completion Modal
-<div class="modal fade" id="tripCompletionModal" tabindex="-1" role="dialog" aria-labelledby="tripCompletionModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="tripCompletionModalLabel">Mark Trip as Completed</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <input type="hidden" id="modalUserId" />
-        <input type="hidden" id="modalTripId" />
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" onclick="saveCompletedTrip()">Save</button>
-      </div>
-    </div>
-  </div>
-</div> -->
-
 <!-- Message Board Section -->
 <div id="messageBoard" class="container mt-4">
   <h3>Trip Messages</h3>
@@ -260,7 +279,7 @@
 </div>
 
 <!-- Post Message Section -->
-<div class="container mt-4">
+<div class="container mt-4 pb-5" >
   <h4>Post a Message</h4>
   <textarea id="messageInput" class="form-control mb-2" placeholder="Type your message here..."></textarea>
   <button onclick="postMessage()" class="btn btn-primary">Post Message</button>
@@ -502,8 +521,8 @@
       var date = new Date(`${editedDateString}T12:00:00Z`); //should fix this time zone issue
       var editedDate = firebase.firestore.Timestamp.fromDate(date);
       // Retrieve other fields as necessary
-      var editedElevation = document.getElementById('editElevation').value;
-      var editedDistance = document.getElementById('editDistance').value;
+      var editedElevation = parseInt(document.getElementById('editElevation').value);
+      var editedDistance = parseInt(document.getElementById('editDistance').value);
 
       const tripRef = firebase.firestore().collection('trips').doc(tripId);
       try {
