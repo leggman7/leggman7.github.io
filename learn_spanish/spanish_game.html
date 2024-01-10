@@ -1,0 +1,220 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta viewport="width=device-width, initial-scale=1.0">
+<title>Language Matching Game</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f7f7f7;
+    }
+    .game-board {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    .card {
+        background: white;
+        height: 100px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        cursor: pointer;
+        font-size: 1em;
+    }
+    .score {
+        font-size: 1.2em;
+    }
+</style>
+</head>
+<body>
+<div class="game-board" id="game-board"></div>
+<div class="score" id="score">Streak: 0</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const words = {
+    "que": "that",
+    "de": "of, from",
+    "no": "no",
+    "a": "to",
+    "la": "the",
+    "NaN": "(for singular feminine nouns)",
+    "el": "the (for masculine singular nouns)",
+    "es": "he is, she is, it is (for essential characteristics)",
+    "y": "and",
+    "en": "in, on, at",
+    "lo": "it, him (direct-object pronoun)",
+    "un": "a, an (for singular masculine nouns)",
+    "por": "for, by, through",
+    "qu\u00e9": "what / how (as in \u201chow nice!\u201d)",
+    "me": "me, myself",
+    "una": "a, an (for singular feminine nouns)",
+    "te": "you (direct-object pronoun)",
+    "los": "the (for plural masculine nouns)",
+    "se": "himself, herself, itself",
+    "con": "with",
+    "para": "for, to",
+    "mi": "my",
+    "est\u00e1": "he is, she is, it is (non-permanent characteristics)",
+    "si": "if",
+    "bien": "well, good",
+    "pero": "but",
+    "yo": "I",
+    "eso": "that",
+    "las": "the (for plural feminine nouns)",
+    "s\u00ed": "yes",
+    "su": "his, her, its",
+    "tu": "your",
+    "aqu\u00ed": "here",
+    "del": "of the, from the, in the",
+    "al": "to the",
+    "como": "how, as, like",
+    "le": "him, her, formal you (indirect object pronoun)",
+    "m\u00e1s": "more",
+    "esto": "this (for singular masculine nouns)",
+    "ya": "already",
+    "todo": "everything",
+    "esta": "this one (for singular feminine nouns)",
+    "vamos": "let\u2019s go, come on",
+    "muy": "very",
+    "hay": "there is",
+    "ahora": "now",
+    "algo": "something",
+    "estoy": "I am (non-permanent characteristics)",
+    "tengo": "I have",
+    "nos": "us",
+    "t\u00fa": "you",
+    "nada": "nothing",
+    "cuando": "when",
+    "ha": "he has, she has, it has (auxiliary)",
+    "este": "this one (for singular masculine nouns)",
+    "s\u00e9": "I know",
+    "est\u00e1s": "you are (non-permanent characteristics)",
+    "as\u00ed": "like this",
+    "puedo": "I can",
+    "c\u00f3mo": "how",
+    "quiero": "I want",
+    "s\u00f3lo": "only, just",
+    "soy": "I am (for essential characteristics)",
+    "tiene": "he has, she has, it has",
+    "gracias": "thank you",
+    "o": "or",
+    "\u00e9l": "he",
+    "bueno": "good",
+    "fue": "he was, she was, it was",
+    "ser": "to be (for permanent characteristics)",
+    "hacer": "to do, to make",
+    "son": "they are (for permanent characteristics)",
+    "todos": "all of us, all of them",
+    "era": "he was, she was, it was (permanent characteristics)",
+    "eres": "you are\u00a0(permanent characteristics)",
+    "vez": "time (as in \u201cone time\u201d)",
+    "tienes": "you have",
+    "creo": "I believe",
+    "ella": "she",
+    "he": "I have (auxiliary)",
+    "ese": "that one",
+    "voy": "I go",
+    "puede": "he can, she can, it can",
+    "sabes": "you know",
+    "hola": "hello",
+    "sus": "his, her (for plural nouns)",
+    "porque": "because",
+    "Dios": "God",
+    "qui\u00e9n": "who",
+    "nunca": "never",
+    "d\u00f3nde": "where",
+    "quieres": "you want",
+    "casa": "house",
+    "favor": "favor",
+    "esa": "that one (for singular feminine nouns)",
+    "dos": "two",
+    "tan": "so",
+    "se\u00f1or": "mister",
+    "tiempo": "time",
+    "verdad": "truth",
+    "estaba": "I was (non-permanent characteristics)"
+};
+        let selectedCards = [];
+        let matchStreak = 0;
+        
+        function createGameBoard(words) {
+            const gameBoard = document.getElementById('game-board');
+            const wordPairs = [];
+            for (let word in words) {
+                wordPairs.push({spanish: word, english: words[word]});
+            }
+            const shuffledPairs = shuffleArray([...wordPairs]);
+            // Select only the first 8 pairs (16 cards total for a 4x4 grid)
+            const selectedPairs = shuffledPairs.slice(0, 8);
+            const gamePairs = [...selectedPairs, ...selectedPairs];
+            const shuffledGamePairs = shuffleArray(gamePairs);
+            shuffledGamePairs.forEach(pair => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.dataset.language = pair.spanish === pair.english ? "spanish" : "english";
+                card.dataset.pairId = pair.spanish;
+                card.textContent = pair[card.dataset.language];
+                card.addEventListener('click', () => onCardClick(card));
+                gameBoard.appendChild(card);
+            });
+        }
+
+        function onCardClick(card) {
+            if (selectedCards.length < 2 && !selectedCards.includes(card)) {
+                card.classList.add('flipped');
+                selectedCards.push(card);
+                if (selectedCards.length === 2) {
+                    checkForMatch();
+                }
+            }
+        }
+
+        function checkForMatch() {
+            if (selectedCards[0].dataset.pairId === selectedCards[1].dataset.pairId) {
+                matchStreak++;
+                selectedCards.forEach(card => card.style.visibility = 'hidden');
+                updateScore();
+                selectedCards = [];
+            } else {
+                setTimeout(() => {
+                    matchStreak = 0;
+                    updateScore();
+                    selectedCards.forEach(card => {
+                        card.classList.remove('flipped');
+                        card.textContent = card.dataset.language === "spanish" ? card.dataset.pairId : words[card.dataset.pairId];
+                    });
+                    selectedCards = [];
+                }, 1000);
+            }
+        }
+
+        function updateScore() {
+            document.getElementById('score').textContent = 'Streak: ' + matchStreak;
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        createGameBoard(words);
+    });
+</script>
+</body>
+</html>
