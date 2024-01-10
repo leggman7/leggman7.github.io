@@ -1,0 +1,109 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Word Match Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .card-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .card {
+            width: 100px;
+            height: 50px;
+            border: 1px solid #ddd;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .card.matched {
+            background-color: #90ee90;
+        }
+    </style>
+</head>
+<body>
+    <h1>Word Match Game</h1>
+    <div class="card-container" id="english-cards"></div>
+    <div class="card-container" id="spanish-cards"></div>
+    <p>Score: <span id="score">0</span></p>
+    <script>
+        const dictionary = [
+            { english: 'Hello', spanish: 'Hola' },
+            { english: 'Goodbye', spanish: 'Adiós' },
+            { english: 'Please', spanish: 'Por favor' },
+            { english: 'Thank you', spanish: 'Gracias' },
+            { english: 'Yes', spanish: 'Sí' },
+            // More words can be added here
+        ];
+
+        let score = 0;
+        let matches = 0;
+        let selectedCards = { english: null, spanish: null };
+
+        function selectCard(language, word) {
+            selectedCards[language] = word;
+            if (selectedCards.english && selectedCards.spanish) {
+                if (dictionary.find(pair => pair.english === selectedCards.english && pair.spanish === selectedCards.spanish)) {
+                    document.querySelectorAll('.card').forEach(card => {
+                        if (card.textContent === selectedCards.english || card.textContent === selectedCards.spanish) {
+                            card.classList.add('matched');
+                        }
+                    });
+                    score++;
+                    matches++;
+                } else {
+                    score = 0;
+                }
+                updateScore();
+                selectedCards = { english: null, spanish: null };
+                if (matches === 5) {
+                    setTimeout(setupGame, 1000); // Reset game after 1 second
+                }
+            }
+        }
+
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+        }
+
+        function setupGame() {
+            matches = 0;
+            const shuffled = dictionary.sort(() => 0.5 - Math.random());
+            const selectedWords = shuffled.slice(0, 5);
+
+            const englishCards = document.getElementById('english-cards');
+            const spanishCards = document.getElementById('spanish-cards');
+
+            englishCards.innerHTML = '';
+            spanishCards.innerHTML = '';
+
+            selectedWords.forEach(pair => {
+                const englishCard = document.createElement('div');
+                englishCard.className = 'card';
+                englishCard.textContent = pair.english;
+                englishCard.onclick = () => selectCard('english', pair.english);
+                englishCards.appendChild(englishCard);
+
+                const spanishCard = document.createElement('div');
+                spanishCard.className = 'card';
+                spanishCard.textContent = pair.spanish;
+                spanishCard.onclick = () => selectCard('spanish', pair.spanish);
+                spanishCards.appendChild(spanishCard);
+            });
+        }
+
+        setupGame();
+    </script>
+</body>
+</html>
