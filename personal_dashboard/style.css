@@ -1,0 +1,20 @@
+/* CSS for the dashboard items */
+.dashboard-item {
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.item-score {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.item-link {
+    margin-right: 10px;
+}
+
+/* Add more styling as needed */
