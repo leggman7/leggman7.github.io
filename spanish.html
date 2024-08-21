@@ -92,56 +92,115 @@
 
     <h2>Conjugating Regular Verbs (Present Indicative)</h2>
 
-<table>
-    <tr>
-        <th colspan="2" style="background-color:#8E44AD; color:white;">-AR:</th>
-    </tr>
-    <tr>
-        <td>Yo</td>
-        <td>-o</td>
-    </tr>
-    <tr>
-        <td>Tú</td>
-        <td>-as</td>
-    </tr>
-    <tr>
-        <td>Él, Ella, Usted</td>
-        <td>-a</td>
-    </tr>
-    <tr>
-        <td>Nosotros</td>
-        <td>-amos</td>
-    </tr>
-    <tr>
-        <td>Ellos, Ellas, Ustedes</td>
-        <td>-an</td>
-    </tr>
-    <tr>
-        <th colspan="2" style="background-color:#C0392B; color:white;">-ER/-IR:</th>
-    </tr>
-    <tr>
-        <td>Yo</td>
-        <td>-o</td>
-    </tr>
-    <tr>
-        <td>Tú</td>
-        <td>-es</td>
-    </tr>
-    <tr>
-        <td>Él, Ella, Usted</td>
-        <td>-e</td>
-    </tr>
-    <tr>
-        <td>Nosotros</td>
-        <td>-emos/-imos</td>
-    </tr>
-    <tr>
-        <td>Ellos, Ellas, Ustedes</td>
-        <td>-en</td>
-    </tr>
-</table>
+    <table>
+        <tr>
+            <th colspan="2" style="background-color:#8E44AD; color:white;">-AR:</th>
+            <th colspan="2" style="background-color:#C0392B; color:white;">-ER/-IR:</th>
+        </tr>
+        <tr>
+            <td>Yo</td>
+            <td>-o</td>
+            <td>Yo</td>
+            <td>-o</td>
+        </tr>
+        <tr>
+            <td>Tú</td>
+            <td>-as</td>
+            <td>Tú</td>
+            <td>-es</td>
+        </tr>
+        <tr>
+            <td>Él, Ella, Usted</td>
+            <td>-a</td>
+            <td>Él, Ella, Usted</td>
+            <td>-e</td>
+        </tr>
+        <tr>
+            <td>Nosotros</td>
+            <td>-amos</td>
+            <td>Nosotros</td>
+            <td>-emos/-imos</td>
+        </tr>
+        <tr>
+            <td>Ellos, Ellas, Ustedes</td>
+            <td>-an</td>
+            <td>Ellos, Ellas, Ustedes</td>
+            <td>-en</td>
+        </tr>
+    </table>
+    
 
 <h2>Regular Verbs</h2>
+
+<button onclick="startPractice()">Practice</button>
+
+    <div class="flashcard" id="flashcard">
+        <h3 id="flashcard-content">Click to Start</h3>
+        <button onclick="showAnswer()">Show Answer</button>
+        <button onclick="nextFlashcard()">Next</button>
+    </div>
+
+    <script>
+        const verbs = [
+            { "spanish": "Comer", "english": "To eat" },
+            { "spanish": "Deber", "english": "To ought to / must" },
+            { "spanish": "Correr", "english": "To run" },
+            { "spanish": "Beber", "english": "To drink" },
+            { "spanish": "Aprender", "english": "To learn" },
+            { "spanish": "Vender", "english": "To sell" },
+            { "spanish": "Romper(se)", "english": "To break" },
+            { "spanish": "Comprender", "english": "To understand / comprehend" },
+            { "spanish": "Sorprender", "english": "To surprise" },
+            { "spanish": "Prender", "english": "To turn on (light) / pin on / arrest" },
+            { "spanish": "Temer", "english": "To fear" },
+            { "spanish": "Barrer", "english": "To sweep" },
+            { "spanish": "Toser", "english": "To cough" },
+            { "spanish": "Soler", "english": "To usually do" },
+            { "spanish": "Vivir", "english": "To live" },
+            { "spanish": "Escribir", "english": "To write" },
+            { "spanish": "Abrir", "english": "To open" },
+            { "spanish": "Recibir", "english": "To receive" },
+            { "spanish": "Subir", "english": "To rise / go up / get on / get into" },
+            { "spanish": "Decidir", "english": "To decide" },
+            { "spanish": "Asistir", "english": "To attend / assist" },
+            { "spanish": "Descubrir", "english": "To discover" },
+            { "spanish": "Dirigir", "english": "To direct" },
+            { "spanish": "Sufrir", "english": "To suffer" },
+            { "spanish": "Ocurrir", "english": "To occur / happen" },
+            { "spanish": "Insistir", "english": "To insist" },
+            { "spanish": "Describir", "english": "To describe" },
+            { "spanish": "Permitir", "english": "To allow / permit" },
+            { "spanish": "Tapar", "english": "To cover" },
+            { "spanish": "Compartir", "english": "To share" },
+            { "spanish": "Aburrir(se)", "english": "To bore (get bored)" },
+            { "spanish": "Discutir", "english": "To discuss / argue / debate" },
+            { "spanish": "Cumplir", "english": "To comply / fulfill" },
+            { "spanish": "Sacudir", "english": "To shake off / dust" },
+            { "spanish": "Consumir", "english": "To consume" },
+            { "spanish": "Imprimir", "english": "To print" },
+            { "spanish": "Prohibir", "english": "To prohibit / ban / forbid" },
+            { "spanish": "Existir", "english": "To exist" }
+        ];
+
+        let currentVerbIndex = 0;
+
+        function startPractice() {
+            document.getElementById('flashcard').style.display = 'block';
+            nextFlashcard();
+        }
+
+        function nextFlashcard() {
+            if (currentVerbIndex >= verbs.length) {
+                currentVerbIndex = 0; // Reset to the first verb if the end is reached
+            }
+            document.getElementById('flashcard-content').innerText = verbs[currentVerbIndex].spanish;
+        }
+
+        function showAnswer() {
+            document.getElementById('flashcard-content').innerText = verbs[currentVerbIndex].english;
+            currentVerbIndex++;
+        }
+    </script>
 
 <table>
     <tr>
