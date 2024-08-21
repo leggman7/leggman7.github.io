@@ -30,6 +30,19 @@
             padding: 10px;
             border: 1px solid #ddd;
         }
+        .flashcard-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
     </style>
 </head>
 <body>
@@ -132,13 +145,17 @@
 
 <h2>Regular Verbs</h2>
 
+
 <button onclick="startPractice()">Practice</button>
 
+<div class="flashcard-overlay" id="flashcard-overlay">
     <div class="flashcard" id="flashcard">
         <h3 id="flashcard-content">Click to Start</h3>
-        <button onclick="showAnswer()">Show Answer</button>
-        <button onclick="nextFlashcard()">Next</button>
+        <button id="flashcard-button" onclick="handleFlashcardAction()">Show Answer</button>
+        <button class="close" onclick="closeFlashcard()">Close</button>
     </div>
+</div>
+
 
     <script>
         const verbs = [
@@ -184,22 +201,41 @@
 
         let currentVerbIndex = 0;
 
-        function startPractice() {
-            document.getElementById('flashcard').style.display = 'block';
-            nextFlashcard();
-        }
+        let showingAnswer = false;
 
-        function nextFlashcard() {
-            if (currentVerbIndex >= verbs.length) {
-                currentVerbIndex = 0; // Reset to the first verb if the end is reached
+        function handleFlashcardAction() {
+            const contentElement = document.getElementById('flashcard-content');
+            const buttonElement = document.getElementById('flashcard-button');
+
+            if (!showingAnswer) {
+                contentElement.innerText = verbs[currentVerbIndex].english;
+                buttonElement.innerText = "Next";
+                showingAnswer = true;
+            } else {
+                currentVerbIndex++;
+                if (currentVerbIndex >= verbs.length) {
+                    currentVerbIndex = 0; // Reset to the first verb if the end is reached
+                }
+                contentElement.innerText = verbs[currentVerbIndex].spanish;
+                buttonElement.innerText = "Show Answer";
+                showingAnswer = false;
             }
-            document.getElementById('flashcard-content').innerText = verbs[currentVerbIndex].spanish;
         }
 
-        function showAnswer() {
-            document.getElementById('flashcard-content').innerText = verbs[currentVerbIndex].english;
-            currentVerbIndex++;
+        function startPractice() {
+            document.getElementById('flashcard-overlay').style.display = 'flex';
+            currentVerbIndex = 0;
+            showingAnswer = false;
+            document.getElementById('flashcard-content').innerText = verbs[currentVerbIndex].spanish;
+            document.getElementById('flashcard-button').innerText = "Show Answer";
         }
+
+        function closeFlashcard() {
+            document.getElementById('flashcard-overlay').style.display = 'none';
+        }
+
+
+
     </script>
 
 <table>
