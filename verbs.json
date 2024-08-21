@@ -1,5 +1,6 @@
 {
     "regular_verbs": [
+      { "spanish": "Jugar", "english": "To play" },
       { "spanish": "Comer", "english": "To eat" },
       { "spanish": "Deber", "english": "To ought to / must" },
       { "spanish": "Correr", "english": "To run" },
