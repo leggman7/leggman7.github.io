@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Spanish Guide</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        h2 {
+            color: #2980b9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .flashcard-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .flashcard {
+            background-color: #ffffff;
+            padding: 40px 20px 60px 20px;
+            border-radius: 15px;
+            text-align: center;
+            width: 350px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+        .flashcard h3 {
+            font-size: 28px;
+            margin-bottom: 40px;
+            color: #333;
+        }
+        .flashcard button#flashcard-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 30px;
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        .flashcard button.close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: transparent;
+            border: none;
+            font-size: 20px;
+            color: #e74c3c;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Basic Spanish Guide</h1>
+
+    <h2>Pronouns</h2>
+    <ul>
+        <li>Yo - I</li>
+        <li>Tú - You (informal)</li>
+        <li>Él/Ella - He/She</li>
+        <li>Nosotros/Nosotras - We</li>
+        <li>Vosotros/Vosotras - You all (informal, Spain)</li>
+        <li>Usted - You (formal)</li>
+        <li>Ustedes - You all (formal)</li>
+        <li>Ellos/Ellas - They</li>
+    </ul>
+
+    <h2>Common Verbs</h2>
+    <ul>
+        <li>Ser - To be (permanent)</li>
+        <li>Estar - To be (temporary)</li>
+        <li>Tener - To have</li>
+        <li>Hacer - To do/make</li>
+        <li>Ir - To go</li>
+        <li>Decir - To say/tell</li>
+        <li>Ver - To see</li>
+        <li>Venir - To come</li>
+        <li>Comer - To eat</li>
+        <li>Hablar - To speak</li>
+    </ul>
+
+    <h2>Common Adjectives</h2>
+    <ul>
+        <li>Bueno/Buena - Good</li>
+        <li>Malo/Mala - Bad</li>
+        <li>Grande - Big</li>
+        <li>Pequeño/Pequeña - Small</li>
+        <li>Feliz - Happy</li>
+        <li>Triste - Sad</li>
+        <li>Rápido/Rápida - Fast</li>
+        <li>Lento/Lenta - Slow</li>
+        <li>Bonito/Bonita - Beautiful</li>
+        <li>Cansado/Cansada - Tired</li>
+    </ul>
+
+    <h2>Common Phrases</h2>
+    <ul>
+        <li>Hola - Hello</li>
+        <li>¿Cómo estás? - How are you?</li>
+        <li>Me llamo... - My name is...</li>
+        <li>¿Dónde está...? - Where is...?</li>
+        <li>Gracias - Thank you</li>
+        <li>Por favor - Please</li>
+        <li>Lo siento - I'm sorry</li>
+        <li>Buenos días - Good morning</li>
+        <li>Buenas noches - Good night</li>
+        <li>Hasta luego - See you later</li>
+        <li>Me encanta - I like</li>
+    </ul>
+
+    <h2>Slang</h2>
+        <ul>
+            <li>Chevere - cool</li>
+            <li>No pasa nada con - Not cool / Lame</li>
+        </ul>
+
+
+    <h2>Conjugating Regular Verbs (Present Indicative)</h2>
+
+    <table>
+        <tr>
+            <th colspan="2" style="background-color:#8E44AD; color:white;">-AR:</th>
+            <th colspan="2" style="background-color:#C0392B; color:white;">-ER/-IR:</th>
+        </tr>
+        <tr>
+            <td>Yo</td>
+            <td>-o</td>
+            <td>Yo</td>
+            <td>-o</td>
+        </tr>
+        <tr>
+            <td>Tú</td>
+            <td>-as</td>
+            <td>Tú</td>
+            <td>-es</td>
+        </tr>
+        <tr>
+            <td>Él, Ella, Usted</td>
+            <td>-a</td>
+            <td>Él, Ella, Usted</td>
+            <td>-e</td>
+        </tr>
+        <tr>
+            <td>Nosotros</td>
+            <td>-amos</td>
+            <td>Nosotros</td>
+            <td>-emos/-imos</td>
+        </tr>
+        <tr>
+            <td>Ellos, Ellas, Ustedes</td>
+            <td>-an</td>
+            <td>Ellos, Ellas, Ustedes</td>
+            <td>-en</td>
+        </tr>
+    </table>
+    
+
+<h2>Regular Verbs</h2>
+
+
+<button onclick="startPractice()">Practice</button>
+
+<div class="flashcard-overlay" id="flashcard-overlay">
+    <div class="flashcard" id="flashcard">
+        <button class="close" onclick="closeFlashcard()">&times;</button>
+        <h3 id="flashcard-content">Click to Start</h3>
+        <button id="flashcard-button" onclick="handleFlashcardAction()">Show Answer</button>
+    </div>
+</div>
+
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('verbs.json')
+                .then(response => response.json())
+                .then(data => {
+                    const verbsTableBody = document.querySelector('#verbsTable tbody');
+                    data.regular_verbs.forEach(verb => {
+                        const row = document.createElement('tr');
+                        const spanishCell = document.createElement('td');
+                        const englishCell = document.createElement('td');
+
+                        spanishCell.textContent = verb.spanish;
+                        englishCell.textContent = verb.english;
+
+                        row.appendChild(spanishCell);
+                        row.appendChild(englishCell);
+                        verbsTableBody.appendChild(row);
+                    });
+                });
+        });
+
+        const verbs = [];
+
+        let currentVerbIndex = 0;
+        let showingAnswer = false;
+
+        function startPractice() {
+            fetch('verbs.json')
+                .then(response => response.json())
+                .then(data => {
+                    verbs.length = 0; // Clear the array
+                    data.regular_verbs.forEach(verb => verbs.push(verb));
+                    document.getElementById('flashcard-overlay').style.display = 'flex';
+                    currentVerbIndex = 0;
+                    showingAnswer = false;
+                    document.getElementById('flashcard-content').innerText = verbs[currentVerbIndex].spanish;
+                    document.getElementById('flashcard-button').innerText = "Flip";
+                });
+        }
+
+        function handleFlashcardAction() {
+            const contentElement = document.getElementById('flashcard-content');
+            const buttonElement = document.getElementById('flashcard-button');
+
+            if (!showingAnswer) {
+                contentElement.innerText = verbs[currentVerbIndex].english;
+                buttonElement.innerText = "Next";
+                showingAnswer = true;
+            } else {
+                currentVerbIndex++;
+                if (currentVerbIndex >= verbs.length) {
+                    currentVerbIndex = 0; // Reset to the first verb if the end is reached
+                }
+                contentElement.innerText = verbs[currentVerbIndex].spanish;
+                buttonElement.innerText = "Flip";
+                showingAnswer = false;
+            }
+        }
+
+        function closeFlashcard() {
+            document.getElementById('flashcard-overlay').style.display = 'none';
+        }
+    </script>
+
+<h2>Common Verbs</h2>
+<table id="verbsTable">
+    <thead>
+        <tr>
+            <th>Spanish Verb</th>
+            <th>English Translation</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Verbs will be dynamically loaded here -->
+    </tbody>
+</table>
+
+       
+
+
+    <a href="https://www.reddit.com/r/learnspanish/comments/2yr1co/comprehensive_guide_to_the_complicated_world_of/#lightbox">Spanish CheetSheet</a>
+</body>
+</html>

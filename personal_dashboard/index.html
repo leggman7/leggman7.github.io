@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthy Habits Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* CSS for the dashboard items */
+        .profile-pic {
+            max-width: 200px; /* Adjust based on your preference */
+            margin-bottom: 20px;
+        }
+
+        .dashboard-item {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            /* Add more styling if needed */
+        }
+
+        .item-score {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .item-link {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div id="characterLevel" class="character-stat">Character Level: 0</div>
+                <div id="unbalanceScore" class="character-stat">Unbalance: 0</div>
+            </div>
+        </div>
+        
+        <!-- Items List -->
+        <div class="items-container">
+            <!-- Dynamic items will be inserted here -->
+        </div>
+
+    <!-- Button to Clear Local Storage -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <button id="clearStorageBtn" class="btn btn-danger">Reset Scores</button>
+        </div>
+    </div>
+
+    </div>
+
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.4.7/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+    
+    document.addEventListener('DOMContentLoaded', function() {
+    var items = [
+        { id: 1, link: 'https://example.com', score: 0, title: 'Meditation' },
+        { id: 2, link: 'https://example.com', score: 0, title: 'Gratitude Journal' },
+        { id: 3, link: 'https://example.com', score: 0, title: 'Gym Session' },
+        { id: 4, link: 'https://example.com', score: 0, title: 'Read a book' },
+        { id: 5, link: 'https://example.com', score: 0, title: 'Work Learning' },
+        { id: 6, link: 'https://example.com', score: 0, title: 'Dreaming Spanish Video' }
+    ];
+
+    // Check if local storage has scores, if not, initialize
+    if (!localStorage.getItem('scores')) {
+        localStorage.setItem('scores', JSON.stringify(items));
+        console.log('Initializing scores for the first time.');
+    } else {
+        items = JSON.parse(localStorage.getItem('scores')); // Update the items array with stored scores
+        console.log('Loaded existing scores.');
+    }
+
+    // Function to create item HTML
+    function createItem(item) {
+        const colDiv = document.createElement('div');
+        colDiv.className = 'col-md-4 dashboard-item';
+
+        const infoDiv = document.createElement('div'); // Div to hold experience and level
+        infoDiv.className = 'item-info';
+
+        const levelSpan = document.createElement('span');
+        levelSpan.className = 'item-level';
+        levelSpan.textContent = `Level: ${Math.round(item.score / 60)}`;
+
+        const experienceSpan = document.createElement('span');
+        experienceSpan.className = 'item-experience';
+        experienceSpan.textContent = ` | Experience: ${item.score}`;
+
+        infoDiv.appendChild(levelSpan);
+        infoDiv.appendChild(experienceSpan); // Append experience and level to the info div
+
+        const linkA = document.createElement('a');
+        linkA.href = item.link;
+        linkA.className = 'item-link';
+        linkA.textContent = item.title;
+
+        const button = document.createElement('button');
+        button.className = 'btn btn-primary';
+        button.textContent = '+';
+        button.onclick = function() {
+            item.score += 5; // Increment experience by 5
+            experienceSpan.textContent = `Experience: ${item.score}`;
+            levelSpan.textContent = ` | Level: ${Math.round(item.score / 60)}`;
+            localStorage.setItem('scores', JSON.stringify(items));
+            updateCharacterStats(); // Update Character Stats whenever an item is updated
+        };
+
+        colDiv.appendChild(infoDiv); // Append the info div to the column
+        colDiv.appendChild(linkA);
+        colDiv.appendChild(button);
+
+        return colDiv;
+    }   
+
+    // Select the row where items will be inserted
+    const itemsRow = document.querySelector('.items-container');
+
+    // Select the 'Reset Scores' button
+    const clearStorageBtn = document.getElementById('clearStorageBtn');
+
+    clearStorageBtn.addEventListener('click', function() {
+    console.log('Reset button clicked.');
+        if (confirm('Are you sure you want to reset all items and scores? This action cannot be undone.')) {
+            console.log('User confirmed to clear all items and scores.');
+
+            // Clear local storage
+            localStorage.removeItem('scores');
+            console.log('Local storage cleared.');
+
+            // Clear the items array
+            items.length = 0;
+
+            // Remove all item elements from the DOM
+            while (itemsRow.firstChild) {
+                itemsRow.removeChild(itemsRow.firstChild);
+            }
+
+            console.log('All item elements removed from the DOM.');
+        } else {
+            console.log('User canceled the reset action.');
+        }
+    });
+
+    // Function to calculate and update the Character Level and Unbalance
+    function updateCharacterStats() {
+        let totalLevel = 0;
+        let maxLevel = 0;
+        let minLevel = Infinity;
+
+        items.forEach(item => {
+            const level = Math.round(item.score / 60);
+            totalLevel += level;
+            if (level > maxLevel) maxLevel = level;
+            if (level < minLevel) minLevel = level;
+        });
+
+        const characterLevel = Math.round(totalLevel / items.length);
+        const unbalanceScore = maxLevel - minLevel;
+
+        console.log(`Character Level: ${characterLevel}`);
+        console.log(`Unbalance: ${unbalanceScore}`);
+
+        document.getElementById('characterLevel').textContent = `Character Level: ${characterLevel}`;
+        document.getElementById('unbalanceScore').textContent = `Unbalance: ${unbalanceScore}`;
+    }
+
+    // Create and append items to the DOM
+    items.forEach(item => {
+        const itemDiv = createItem(item);
+        itemsRow.appendChild(itemDiv);
+    });
+
+    // Initial calculation and display of Character Stats
+    updateCharacterStats();
+
+
+});
+
+    </script>
+</body>
+</html>
