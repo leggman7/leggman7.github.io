@@ -6,9 +6,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ryan Leggetts External Mind 2</title>
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    .schedule {
+      margin: 2rem 0;
+      padding: 1.5rem;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border: 1px solid #dee2e6;
+      max-width: 900px;
+    }
+    .schedule h2 {
+      margin-top: 0;
+      font-size: 1.4rem;
+      color: #333;
+    }
+    .schedule-desc {
+      color: #666;
+      margin: 0 0 1rem 0;
+      font-size: 0.9rem;
+      font-style: italic;
+    }
+    .calendar-wrapper {
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+  </style>
 </head>
 <body>
 <h1>A website about learning to code web apps</h1>
+
+<div class="schedule">
+    <h2>Work Schedule</h2>
+    <p class="schedule-desc">2 weeks on / 2 weeks off rotation</p>
+    <div class="calendar-wrapper">
+      <iframe
+        src="https://calendar.google.com/calendar/embed?src=ik5iduid7se468qob0p6nm4r20%40group.calendar.google.com&ctz=America%2FVancouver&mode=MONTH&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=0&showCalendars=0&showTz=0&bgcolor=%23ffffff&color=%234285F4"
+        style="border: none;"
+        width="100%"
+        height="600"
+        frameborder="0"
+        scrolling="no"
+        title="Work Schedule Calendar">
+      </iframe>
+    </div>
+  </div>
+
 <div class="spanish">
   <h2>Spanish</h2>
   <div><a href="./learn_spanish/spanish_gameV2.html">A spanish learning game</a></div>
@@ -42,6 +85,8 @@
     <div><a href="./learn_spanish/spanish_game.html">Spanish Game</a></div>
     <div><a href="./personal_dashboard/index.html">Personal Dashboard</a></div>
   </div>
+
+  
 
   <div class="investing">
     <iframe src='https://d3fy651gv2fhd3.cloudfront.net/embed/?s=canadamonsupm0&v=202401230215V20230410&w=850&h=400&d1=20140204&h=300&w=600' height='300' width='600'  frameborder='0' scrolling='no'></iframe><br />source: <a href='https://tradingeconomics.com/canada/money-supply-m0'>tradingeconomics.com</a>
