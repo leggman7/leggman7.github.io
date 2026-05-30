@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Equipment Hours Tracker</title>
+
+<!-- Supabase JS client (v2) from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+  :root{
+    --bg:#F4F1EC; --card:#FFFFFF; --ink:#1A1714; --muted:#6B6258; --line:#E2DCD2;
+    --accent:#E8662A; --accent-ink:#B84D17; --ok:#3F8F6B; --warn:#C0492F;
+    --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    background-image:repeating-linear-gradient(45deg,transparent,transparent 11px,rgba(0,0,0,0.012) 11px,rgba(0,0,0,0.012) 12px);}
+  .wrap{max-width:920px;margin:0 auto;padding:28px 18px 80px;}
+
+  header{border-bottom:3px solid var(--ink);padding-bottom:14px;margin-bottom:24px;}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent-ink);}
+  h1{font-size:clamp(26px,5vw,38px);font-weight:800;letter-spacing:-.02em;margin-top:4px;}
+  .sub{color:var(--muted);font-size:14px;margin-top:4px;}
+
+  .banner{border:2px dashed var(--warn);background:#FBEDE9;color:#7A2D1B;border-radius:10px;
+    padding:16px 18px;margin-bottom:22px;font-size:14px;}
+  .banner code{font-family:var(--mono);background:#fff;padding:1px 5px;border-radius:4px;border:1px solid var(--line);}
+  .banner h3{font-size:15px;margin-bottom:6px;}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  @media(max-width:720px){.grid{grid-template-columns:1fr;}}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;
+    box-shadow:0 1px 0 #fff inset,0 10px 30px -22px rgba(0,0,0,.5);}
+  .card h2{font-size:13px;font-family:var(--mono);letter-spacing:.16em;text-transform:uppercase;
+    color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+  .card h2::before{content:"";width:10px;height:10px;background:var(--accent);border-radius:2px;}
+
+  label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:600;}
+  input,select,textarea{width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:9px;
+    font-family:var(--sans);font-size:15px;background:#fff;color:var(--ink);outline:none;transition:border-color .15s;}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent);}
+  input[type=number]{font-family:var(--mono);font-weight:600;}
+  .row{display:flex;gap:10px;}
+  .row>*{flex:1;}
+  .field{margin-bottom:14px;}
+  .check{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--muted);cursor:pointer;}
+  .check input{width:auto;}
+
+  button{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:12px 16px;
+    font-family:var(--sans);font-weight:700;font-size:15px;cursor:pointer;width:100%;transition:filter .15s,transform .05s;}
+  button:hover{filter:brightness(1.05);}
+  button:active{transform:translateY(1px);}
+  button.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line);}
+
+  .msg{margin-top:12px;font-size:13.5px;font-family:var(--mono);padding:9px 11px;border-radius:8px;display:none;}
+  .msg.show{display:block;}
+  .msg.ok{background:#E7F2EC;color:var(--ok);}
+  .msg.err{background:#FBEDE9;color:var(--warn);}
+
+  .fleet{margin-top:18px;}
+  .unit{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer;}
+  .unit:last-child{border-bottom:none;}
+  .unit:hover{background:#FAF7F2;}
+  .unit .id{font-family:var(--mono);font-weight:700;}
+  .unit .cat{font-size:12px;color:var(--muted);}
+  .unit .hrs{font-family:var(--mono);font-weight:700;font-size:18px;}
+  .unit .hrs small{font-size:11px;color:var(--muted);font-weight:400;}
+
+  .full{grid-column:1/-1;}
+  table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:13px;margin-top:6px;}
+  th{text-align:right;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
+    padding:9px 10px;border-bottom:2px solid var(--ink);font-weight:600;}
+  th:first-child,td:first-child{text-align:left;}
+  td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:right;}
+  tr:hover td{background:#FAF7F2;}
+  .pill{display:inline-block;font-size:10px;background:#FBEDE9;color:var(--warn);padding:1px 7px;border-radius:20px;font-weight:700;}
+  .empty{color:var(--muted);font-size:13px;text-align:center;padding:24px;}
+  .hint{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.45;}
+  .delta-up{color:var(--ok);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">Maintenance · Reliability</div>
+    <h1>Equipment Hours Tracker</h1>
+    <div class="sub">Log daily service-meter readings. Data is stored in Supabase and shared across every device.</div>
+  </header>
+
+  <div id="setupBanner" class="banner" style="display:none;">
+    <h3>⚙ Configuration needed</h3>
+    Open this file and paste your Supabase <code>URL</code> and <code>anon key</code> into the
+    <code>CONFIG</code> block near the bottom of the page, then re-deploy. Until then the page can't reach the database.
+  </div>
+
+  <div class="grid">
+    <!-- LOG A READING -->
+    <section class="card">
+      <h2>Log meter hours</h2>
+      <div class="field">
+        <label for="r_unit">Unit</label>
+        <select id="r_unit"><option value="">— select equipment —</option></select>
+      </div>
+      <div class="row field">
+        <div>
+          <label for="r_hours">Meter hours</label>
+          <input id="r_hours" type="number" step="0.1" min="0" placeholder="e.g. 14820.5">
+        </div>
+        <div>
+          <label for="r_date">Date</label>
+          <input id="r_date" type="date">
+        </div>
+      </div>
+      <div class="field">
+        <label for="r_operator">Operator</label>
+        <input id="r_operator" type="text" placeholder="Your name">
+      </div>
+      <div class="field">
+        <label for="r_note">Note (optional)</label>
+        <input id="r_note" type="text" placeholder="e.g. post-PM, idle high">
+      </div>
+      <label class="check field"><input id="r_reset" type="checkbox"> Meter was reset / replaced (allows a lower reading)</label>
+      <button id="r_submit">Save reading</button>
+      <div id="r_msg" class="msg"></div>
+      <div class="hint">Enter the <strong>cumulative</strong> reading shown on the meter — not the hours run today. The app computes daily usage for you.</div>
+    </section>
+
+    <!-- FLEET -->
+    <section class="card">
+      <h2>Fleet — latest hours</h2>
+      <div id="fleet" class="fleet"><div class="empty">Loading…</div></div>
+
+      <h2 style="margin-top:24px;">Add a unit</h2>
+      <div class="row field">
+        <div><label for="e_unit">Unit ID</label><input id="e_unit" type="text" placeholder="SH-412"></div>
+        <div><label for="e_cat">Category</label><input id="e_cat" type="text" placeholder="Shovel"></div>
+      </div>
+      <div class="field"><label for="e_name">Name (optional)</label><input id="e_name" type="text" placeholder="P&amp;H 4100 Shovel #2"></div>
+      <button id="e_submit" class="ghost">Add unit</button>
+      <div id="e_msg" class="msg"></div>
+    </section>
+
+    <!-- HISTORY -->
+    <section class="card full">
+      <h2>History &amp; utilization</h2>
+      <div class="field" style="max-width:320px;">
+        <label for="h_unit">Show readings for</label>
+        <select id="h_unit"><option value="">— select equipment —</option></select>
+      </div>
+      <div style="overflow-x:auto;">
+        <table id="histTable">
+          <thead><tr>
+            <th>Date</th><th>Meter hrs</th><th>Δ hrs</th><th>Δ days</th><th>hrs/day</th><th>Operator</th><th>Note</th>
+          </tr></thead>
+          <tbody><tr><td colspan="7" class="empty">Pick a unit to see its history.</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+/* =================================================================
+   CONFIG  —  paste your two Supabase values between the quotes.
+   Find them in: Supabase dashboard > Project Settings > API
+   - Project URL      -> SUPABASE_URL
+   - Project API keys > "anon public"  -> SUPABASE_ANON_KEY
+   The anon key is safe to expose in client code; Row Level Security
+   in the database is what protects your data.
+   ================================================================= */
+const SUPABASE_URL      = "https://gznuufhvqiloonrmlpbg.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_miiXwtNDGPPsUE6SKfge4A_mnDuo7mO";
+/* ================================================================= */
+
+const configured = !SUPABASE_URL.includes("YOUR-PROJECT") && !SUPABASE_ANON_KEY.includes("YOUR-ANON");
+let db = null;
+if (configured) db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+else document.getElementById("setupBanner").style.display = "block";
+
+const $ = id => document.getElementById(id);
+const fmt = n => Number(n).toLocaleString(undefined,{minimumFractionDigits:1,maximumFractionDigits:1});
+
+function flash(el, text, ok){
+  el.textContent = text;
+  el.className = "msg show " + (ok ? "ok" : "err");
+  if (ok) setTimeout(()=>{ el.className = "msg"; }, 4000);
+}
+
+// Default the date field to today (local), and remember the operator name on THIS device only.
+$("r_date").value = new Date().toLocaleDateString("en-CA");           // yyyy-mm-dd
+$("r_operator").value = localStorage.getItem("op_name") || "";        // device-local convenience, not the source of truth
+
+let equipmentCache = [];
+
+async function loadEquipment(){
+  if (!db) return;
+  const { data, error } = await db.from("equipment").select("*").order("unit_id");
+  if (error){ console.error(error); return; }
+  equipmentCache = data;
+
+  // populate the two dropdowns
+  const opts = '<option value="">— select equipment —</option>' +
+    data.map(e => `<option value="${e.id}">${e.unit_id}${e.name ? " — "+e.name : ""}</option>`).join("");
+  $("r_unit").innerHTML = opts;
+  $("h_unit").innerHTML = opts;
+
+  await renderFleet();
+}
+
+async function renderFleet(){
+  const box = $("fleet");
+  if (!equipmentCache.length){ box.innerHTML = '<div class="empty">No units yet — add one below.</div>'; return; }
+
+  // latest reading per unit
+  const { data: reads } = await db.from("readings").select("equipment_id,hours,reading_date")
+    .order("reading_date",{ascending:false}).order("created_at",{ascending:false});
+  const latest = {};
+  (reads||[]).forEach(r => { if (!(r.equipment_id in latest)) latest[r.equipment_id] = r; });
+
+  box.innerHTML = equipmentCache.map(e => {
+    const l = latest[e.id];
+    const hrs = l ? `${fmt(l.hours)}<small> h · ${l.reading_date}</small>` : '<small>no readings</small>';
+    return `<div class="unit" data-id="${e.id}">
+      <div><div class="id">${e.unit_id}</div><div class="cat">${e.name || e.category || ""}</div></div>
+      <div class="hrs">${hrs}</div></div>`;
+  }).join("");
+
+  box.querySelectorAll(".unit").forEach(u =>
+    u.addEventListener("click", () => { $("h_unit").value = u.dataset.id; loadHistory(); }));
+}
+
+async function loadHistory(){
+  const id = $("h_unit").value;
+  const body = $("histTable").querySelector("tbody");
+  if (!id){ body.innerHTML = '<tr><td colspan="7" class="empty">Pick a unit to see its history.</td></tr>'; return; }
+
+  const { data, error } = await db.from("readings").select("*")
+    .eq("equipment_id", id).order("reading_date",{ascending:true}).order("created_at",{ascending:true});
+  if (error){ console.error(error); return; }
+  if (!data.length){ body.innerHTML = '<tr><td colspan="7" class="empty">No readings for this unit yet.</td></tr>'; return; }
+
+  // build rows newest-first, with deltas vs the previous reading
+  const rows = data.map((r, i) => {
+    const prev = data[i-1];
+    let dHrs="—", dDays="—", perDay="—";
+    if (prev && !r.is_reset){
+      const dh = r.hours - prev.hours;
+      const dd = Math.round((new Date(r.reading_date) - new Date(prev.reading_date)) / 86400000);
+      dHrs = (dh>=0?"+":"") + fmt(dh);
+      dDays = dd;
+      perDay = dd>0 ? fmt(dh/dd) : "—";
+    }
+    return { r, dHrs, dDays, perDay };
+  }).reverse();
+
+  body.innerHTML = rows.map(({r,dHrs,dDays,perDay}) =>
+    `<tr>
+      <td>${r.reading_date}${r.is_reset?' <span class="pill">RESET</span>':''}</td>
+      <td>${fmt(r.hours)}</td>
+      <td class="${dHrs.startsWith('+')?'delta-up':''}">${dHrs}</td>
+      <td>${dDays}</td>
+      <td>${perDay}</td>
+      <td>${r.operator || "—"}</td>
+      <td style="text-align:left">${r.note || ""}</td>
+    </tr>`).join("");
+}
+
+// ---- submit a reading ----
+$("r_submit").addEventListener("click", async () => {
+  if (!db) return;
+  const equipment_id = $("r_unit").value;
+  const hours = parseFloat($("r_hours").value);
+  if (!equipment_id) return flash($("r_msg"), "Select a unit first.", false);
+  if (isNaN(hours))   return flash($("r_msg"), "Enter the meter hours.", false);
+
+  const operator = $("r_operator").value.trim();
+  if (operator) localStorage.setItem("op_name", operator);
+
+  const payload = {
+    equipment_id, hours,
+    reading_date: $("r_date").value || new Date().toLocaleDateString("en-CA"),
+    operator: operator || null,
+    note: $("r_note").value.trim() || null,
+    is_reset: $("r_reset").checked
+  };
+
+  $("r_submit").disabled = true;
+  const { error } = await db.from("readings").insert(payload);
+  $("r_submit").disabled = false;
+
+  if (error) return flash($("r_msg"), error.message, false);
+  flash($("r_msg"), "Saved ✓", true);
+  $("r_hours").value = ""; $("r_note").value = ""; $("r_reset").checked = false;
+  await renderFleet();
+  if ($("h_unit").value === equipment_id) loadHistory();
+});
+
+// ---- add a unit ----
+$("e_submit").addEventListener("click", async () => {
+  if (!db) return;
+  const unit_id = $("e_unit").value.trim();
+  if (!unit_id) return flash($("e_msg"), "Unit ID is required.", false);
+
+  const { error } = await db.from("equipment").insert({
+    unit_id, name: $("e_name").value.trim() || null, category: $("e_cat").value.trim() || null
+  });
+  if (error) return flash($("e_msg"), error.message, false);
+  flash($("e_msg"), "Unit added ✓", true);
+  $("e_unit").value=""; $("e_name").value=""; $("e_cat").value="";
+  await loadEquipment();
+});
+
+$("h_unit").addEventListener("change", loadHistory);
+
+// ---- go ----
+if (db) loadEquipment();
+</script>
+</body>
+</html>
